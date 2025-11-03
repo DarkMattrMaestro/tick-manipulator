@@ -6,30 +6,30 @@ This mod adds commands and keybinds that make analysing Cosmic Reach tick-by-tic
 
 ## Keybind Information
 Stepping:
-- '\<Page Up\>' to go to step forward one tick when ticking is frozen.
+- `<Page Up>` to go to step forward one tick when ticking is frozen.
 
 ## Command Information
-All commands take the general form '/tick {action} {arg1} {arg2} {...}'.
+All commands take the general form `/tick {action} {arg1} {arg2} {...}`.
 
 Help
-- '/tick help' to get this help command.
+- `/tick help` to get this help command.
 
 Resetting:
-- '/tick reset' to reset all ticking modifiers to the vanilla default (unfrozen, no delay).
+- `/tick reset` to reset all ticking modifiers to the vanilla default (unfrozen, no delay).
 
 Freezing:
-- '/tick freeze' to freeze the game's ticking.
-- '/tick unfreeze' to unfreeze the game's ticking.
+- `/tick freeze` to freeze the game's ticking.
+- `/tick unfreeze` to unfreeze the game's ticking.
 
 Stepping:
-- '/tick step' to step to the next tick.
-- '/tick step {number of ticks}' to step the given number of ticks. Ticks are evaluated as usual
-  then paused once the given number of ticks are processed. Eg. '/tick step 5' ticks the game
+- `/tick step` to step to the next tick.
+- `/tick step {number of ticks}` to step the given number of ticks. Ticks are evaluated as usual
+  then paused once the given number of ticks are processed. Eg. `/tick step 5` ticks the game
   five times.
 
 Delaying:
-- '/tick delay {delay in milliseconds}' to wait the given number of milliseconds before each tick.
-  Eg. '/tick delay 1000' waits one second before each tick.
+- `/tick delay {delay in milliseconds}` to wait the given number of milliseconds before each tick.
+  Eg. `/tick delay 1000` waits one second before each tick.
 
 Notes:
 - Stepping and Delaying are mutually exclusive. Stepping can only be used when ticking is frozen,
