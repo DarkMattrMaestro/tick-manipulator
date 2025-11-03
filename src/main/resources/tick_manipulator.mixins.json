@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.darkmattrmaestro.tick_manipulator.mixins",
+  "compatibilityLevel": "JAVA_24",
+  "mixins": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

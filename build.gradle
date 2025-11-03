@@ -1,0 +1,66 @@
+plugins {
+    id "java"
+    id "jigsaw"
+    id 'com.gradleup.shadow'
+}
+
+loom {
+    splitEnvironmentSourceSets()
+    mods {
+        "${id}" {
+            sourceSet sourceSets.main
+            sourceSet sourceSets.client
+        }
+    }
+//    accessWidenerPath = file("src/main/resources/${id}.manipulator")
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'Jitpack'
+        url = "https://jitpack.io"
+    }
+    maven {
+        name = 'MixinSquared'
+        url = "https://maven.bawnorton.com/releases"
+    }
+}
+
+dependencies {
+    cosmicReach("finalforeach:cosmicreach:${cosmic_reach_version}")
+//    implementation project(":common")
+}
+
+processResources {
+    def resourceTargets = [ "puzzle.mod.json" ]
+
+    // Left item is the name in the target, right is the variable name
+    def replaceProperties = [
+            "mod_version"     : project.version,
+            "mod_desc"        : desc,
+            "mod_group"       : project.group,
+            "mod_name"        : rootProject.name,
+            "mod_id"          : id,
+            "cr_version"    : cosmic_reach_version,
+            "puzzle_loader_cosmic"    : puzzle_cosmic_version,
+            "puzzle_loader_core"      : puzzle_core_version
+    ]
+
+
+    inputs.properties replaceProperties
+    replaceProperties.put "project", project
+    filesMatching(resourceTargets) {
+        expand replaceProperties
+    }
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(24)
+    }
+}
+
+
+
+
