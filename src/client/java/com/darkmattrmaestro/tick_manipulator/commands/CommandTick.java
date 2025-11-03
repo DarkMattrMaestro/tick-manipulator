@@ -102,7 +102,7 @@ public class CommandTick extends Command {
                                 return;
                             }
                             ZoneTickingUtils.setDelay(delay);
-                            sendMsg("Stepped " + delay + " ticks");
+                            sendMsg("Set delay to " + delay + " ms");
                         } catch (NumberFormatException e) {
                             sendMsg("The command must be of the form /tick delay {delay in milliseconds}");
                         }
