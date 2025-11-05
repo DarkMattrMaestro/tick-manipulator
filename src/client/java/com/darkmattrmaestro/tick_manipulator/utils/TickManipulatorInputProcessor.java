@@ -2,18 +2,31 @@ package com.darkmattrmaestro.tick_manipulator.utils;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
-import com.darkmattrmaestro.tick_manipulator.interfaces.IMixinZone;
-import finalforeach.cosmicreach.singletons.GameSingletons;
-import finalforeach.cosmicreach.world.Zone;
+import com.darkmattrmaestro.tick_manipulator.Constants;
+import com.darkmattrmaestro.tick_manipulator.commands.CommandTick;
+import finalforeach.cosmicreach.chat.Chat;
+import finalforeach.cosmicreach.networking.client.ClientNetworkManager;
+import finalforeach.cosmicreach.networking.packets.CommandPacket;
 
 public class TickManipulatorInputProcessor implements InputProcessor {
     @Override
     public boolean keyDown (int keycode) {
+        String[] command = null;
         switch (keycode) {
             case Input.Keys.PAGE_UP -> {
-                for (Zone zone : GameSingletons.world.getZones()) {
-                    ((IMixinZone)zone).setAdvanceTicks(1);
-                }
+                Constants.LOGGER.info("PAGE_UP pressed");
+                command = new String[]{"tick", "step"};
+            }
+        }
+
+        if (command != null) {
+            CommandTick cmdTick = new CommandTick();
+            if (ClientNetworkManager.isConnected()) {
+                CommandPacket packet = new CommandPacket(command);
+                ClientNetworkManager.sendAsClient(packet);
+            } else {
+                cmdTick.setup(null, command);
+                cmdTick.run(Chat.MAIN_CLIENT_CHAT);
             }
         }
 

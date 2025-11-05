@@ -12,7 +12,7 @@
     "icon": "${mod_id}:icons/icon.png"
   },
   "entrypoints": {
-    "client-init": [
+    "init": [
       "com.darkmattrmaestro.tick_manipulator.TickManipulator"
     ]
   },
