@@ -14,6 +14,9 @@
   "entrypoints": {
     "init": [
       "com.darkmattrmaestro.tick_manipulator.TickManipulator"
+    ],
+    "client-init": [
+      "com.darkmattrmaestro.tick_manipulator.ClientTickManipulator"
     ]
   },
   "depends": {

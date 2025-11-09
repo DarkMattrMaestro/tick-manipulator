@@ -8,6 +8,8 @@ import finalforeach.cosmicreach.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.function.Consumer;
 
 public class Constants {
@@ -19,4 +21,6 @@ public class Constants {
             (String msg) -> Chat.MAIN_CLIENT_CHAT.addMessage(null, msg) :
             (String msg) -> ServerSingletons.SERVER.broadcastToAll(new MessagePacket(msg));
 
+    public static final HashSet<String> POSITIVES = new HashSet<String>(Arrays.asList("true", "yes", "on"));
+    public static final HashSet<String> NEGATIVES = new HashSet<String>(Arrays.asList("false", "no", "off"));
 }
