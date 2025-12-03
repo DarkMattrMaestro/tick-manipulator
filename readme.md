@@ -46,7 +46,7 @@ Highlighting:
 Data Querying:
 - `/data` to get data about the block that is in the current line of sight (up to 100 blocks away).
   Key-data pairs that are separated by a colon (e.g. `chunk : (97, 2, 34)`) represent fields.
-  Key-data pairs separated by an arrow (e.g. `getCenterY() -> 32.5`) represent parameterless methods.
+  Key-data pairs separated by an arrow (e.g. `getCenterY -> 32.5`) represent parameterless methods.
 
 ## Dependencies:
 - Puzzle Loader
