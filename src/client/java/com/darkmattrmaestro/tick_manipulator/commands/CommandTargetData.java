@@ -59,6 +59,7 @@ public class CommandTargetData extends Command {
             BlockPosition blockPos = BlockSelectionUtil.getBlockLookingAtFar(100);
             if (blockPos == null) {
                 Constants.LOGGER.info("No block found!");
+                sendMsg("No block found!");
                 return;
             }
 

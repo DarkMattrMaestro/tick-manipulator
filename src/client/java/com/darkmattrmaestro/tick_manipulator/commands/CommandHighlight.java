@@ -19,7 +19,7 @@ public class CommandHighlight extends Command {
 
         String action = this.getNextArg().toLowerCase();
         switch (action) {
-            case "particle": {
+            case "particles": {
                 if (!this.hasNextArg()) {
                     sendMsg("Particles highlighted: " + Highlight.highlightParticles);
                     break;
@@ -36,7 +36,7 @@ public class CommandHighlight extends Command {
                 }
                 break;
             }
-            case "entity": {
+            case "entities": {
                 if (!this.hasNextArg()) {
                     sendMsg("Entities highlighted: " + Highlight.highlightEntities);
                     break;
@@ -106,7 +106,7 @@ public class CommandHighlight extends Command {
                 break;
             }
             default: {
-                sendMsg("Incorrect argument provided! The first argument must be one of `particle` or `entity`.");
+                sendMsg("Incorrect argument provided! The first argument must be one of `particles` or `entities`.");
                 break;
             }
         }
