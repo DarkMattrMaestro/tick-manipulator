@@ -1,14 +1,10 @@
 package com.darkmattrmaestro.tick_manipulator.commands;
 
 import com.darkmattrmaestro.tick_manipulator.Constants;
-import com.darkmattrmaestro.tick_manipulator.mixins.ZoneMixin;
+import com.darkmattrmaestro.tick_manipulator.PerWorldSingletons;
 import com.darkmattrmaestro.tick_manipulator.utils.ZoneTickingUtils;
-import finalforeach.cosmicreach.accounts.Account;
 import finalforeach.cosmicreach.chat.IChat;
 import finalforeach.cosmicreach.chat.commands.Command;
-
-import java.util.ArrayList;
-import java.util.function.Consumer;
 
 import static com.darkmattrmaestro.tick_manipulator.utils.ChatUtils.sendMsg;
 
@@ -38,6 +34,11 @@ public class CommandTick extends Command {
             - '/tick delay {delay in milliseconds}' to wait the given number of milliseconds before each tick.
                 Eg. '/tick delay 1000' waits one second before each tick.
             
+            Repeating:
+            - '/tick repeat add {command}' adds the given command (without a slash) to the list of commands to
+                run every tick. E.g. '/tick repeat add data entity velocity'.
+            - '/tick repeat clear' clears the list of commands to run every tick.
+            
             Notes:
             - Stepping and Delaying are mutually exclusive. Stepping can only be used when ticking is frozen,
                 while delaying requires ticking to be unfrozen.
@@ -52,27 +53,26 @@ public class CommandTick extends Command {
         sendMsg(HELP_MSG);
     }
 
-    public static ArrayList<Consumer<Void>> repeatCalls = new ArrayList<Consumer<Void>>();
     public void repeat(IChat chat) {
         if (this.hasNextArg()) {
             String action = this.getNextArg().toLowerCase();
 
             if ("clear".equals(action)) {
-                CommandTick.repeatCalls.clear();
+                PerWorldSingletons.repeatCalls.clear();
             } else if ("add".equals(action)) {
                 String[] subcallArgs = new String[this.getNumberOfArgsLeft()];
                 for (int i = 0; i < subcallArgs.length; i++) {
                     subcallArgs[i] = this.getNextArg();
                 }
-                CommandTick.repeatCalls.add((_) -> {
+                PerWorldSingletons.repeatCalls.add((_) -> {
                     triggerCommand(chat, this.account, subcallArgs);
                 });
             } else {
                 sendMsg("Unrecognized tick repeat action! Only `clear` and `add` are valid.");
             }
         } else {
-            Constants.LOGGER.warn("Repeating {} actions every tick.", CommandTick.repeatCalls.size());
-            sendMsg("Repeating " + CommandTick.repeatCalls.size() + " actions every tick.");
+            Constants.LOGGER.warn("Repeating {} actions every tick.", PerWorldSingletons.repeatCalls.size());
+            sendMsg("Repeating " + PerWorldSingletons.repeatCalls.size() + " actions every tick.");
         }
     }
 

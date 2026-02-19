@@ -3,7 +3,7 @@ package com.darkmattrmaestro.tick_manipulator.mixins;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
-import com.darkmattrmaestro.tick_manipulator.commands.CommandTick;
+import com.darkmattrmaestro.tick_manipulator.PerWorldSingletons;
 import com.darkmattrmaestro.tick_manipulator.interfaces.IMixinZone;
 import finalforeach.cosmicreach.RandomTicks;
 import finalforeach.cosmicreach.blocks.blockentities.BlockEntity;
@@ -22,10 +22,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.ArrayList;
 import java.util.PriorityQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 import static com.darkmattrmaestro.tick_manipulator.utils.ChatUtils.sendMsg;
 import static java.lang.Integer.max;
@@ -175,7 +173,7 @@ public class ZoneMixin implements Json.Serializable, Disposable, IMixinZone {
             this.setAdvanceTicks(this.getAdvanceTicks() - 1);
         }
 
-        CommandTick.repeatCalls.forEach((repeatCall) -> {
+        PerWorldSingletons.repeatCalls.forEach((repeatCall) -> {
             repeatCall.accept(null);
         });
     }

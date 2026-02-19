@@ -9,6 +9,11 @@ import finalforeach.cosmicreach.util.ArrayUtils;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class EntitySelectionUtil {
+    /**
+     * Get the nearest entity to the player that is not a player.
+     *
+     * @return the nearest entity to the player that is not a player.
+     */
     public static Entity getNearestEntityToPlayer() {
         Vector3 playerPos = InGame.getLocalPlayer().getPosition();
         AtomicReference<Entity> entity = new AtomicReference<>();

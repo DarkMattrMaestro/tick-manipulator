@@ -113,6 +113,6 @@ public class CommandHighlight extends Command {
     }
 
     public String getShortDescription() {
-        return "Many utilities relating to ticks. Type '/tick help' for more information.";
+        return "Highlight various things by rendering them on top.";
     }
 }

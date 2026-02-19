@@ -6,10 +6,12 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.utils.Array;
 import com.darkmattrmaestro.tick_manipulator.Highlight;
+import com.darkmattrmaestro.tick_manipulator.PerWorldSingletons;
 import com.darkmattrmaestro.tick_manipulator.utils.TickManipulatorInputProcessor;
 import finalforeach.cosmicreach.TickRunner;
 import finalforeach.cosmicreach.entities.Entity;
 import finalforeach.cosmicreach.entities.player.Player;
+import finalforeach.cosmicreach.gamestates.GameState;
 import finalforeach.cosmicreach.gamestates.InGame;
 import finalforeach.cosmicreach.rendering.GameParticleRenderer;
 import finalforeach.cosmicreach.singletons.GameSingletons;
@@ -41,6 +43,11 @@ public class InGameMixin {
         Gdx.input.setInputProcessor(this.inputMultiplexer);
     }
 
+    /**
+     * Render highlighted elements, e.g. entities, particles.
+     *
+     * @param playerZone the zone in which is situated the player.
+     */
     protected void renderHighlight(Zone playerZone) {
 //        boolean usePostProcessing = false;
 //        boolean useUnderwaterPostProcessing = false;
@@ -83,7 +90,7 @@ public class InGameMixin {
 //        this.viewport.apply();
 //        sky.drawSky(rawWorldCamera);
 //        GameSingletons.zoneRenderer.render(playerZone, rawWorldCamera);
-//        Gdx.gl.glDepthMask(true);
+        Gdx.gl.glDepthMask(true);
 //        Array<IRenderable> allRenderableBlockEntities = playerZone.allRenderableBlockEntities;
 //
 //        for(int i = 0; i < allRenderableBlockEntities.size; ++i) {
@@ -119,6 +126,11 @@ public class InGameMixin {
 
     @Shadow
     protected void renderWorld(Zone playerZone) {}
+
+    @Inject(method = "switchAwayTo(Lfinalforeach/cosmicreach/gamestates/GameState;)V", at = @At(value = "INVOKE", target = "Lfinalforeach/cosmicreach/chat/Chat;clear()V"))
+    public void onWorldExit(GameState gameState, CallbackInfo ci) {
+        PerWorldSingletons.repeatCalls.clear();
+    }
 
     @Inject(method = "render", at = @At(value = "TAIL"))
     public void render(CallbackInfo ci) {

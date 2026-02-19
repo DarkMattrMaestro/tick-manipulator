@@ -3,10 +3,8 @@ package com.darkmattrmaestro.tick_manipulator.commands;
 import com.darkmattrmaestro.tick_manipulator.Constants;
 import com.darkmattrmaestro.tick_manipulator.utils.BlockSelectionUtil;
 import com.darkmattrmaestro.tick_manipulator.utils.EntitySelectionUtil;
-import finalforeach.cosmicreach.blocks.BlockPosition;
 import finalforeach.cosmicreach.chat.IChat;
 import finalforeach.cosmicreach.chat.commands.Command;
-import finalforeach.cosmicreach.entities.Entity;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -18,10 +16,25 @@ import static com.darkmattrmaestro.tick_manipulator.utils.ChatUtils.sendMsg;
 
 public class CommandTargetData extends Command {
     public static final String indent = "    ";
+
+    /**
+     * Return the String that represents the given indent level.
+     *
+     * @param level the current level of indentation.
+     * @return the String that represents the given indent level.
+     */
     public static String getIndent(int level) {
         return indent.repeat(level);
     }
 
+    /**
+     *
+     * @param msg the StringBuilder to which to append.
+     * @param resStr the response of querying the given object, converted to a string.
+     * @param propName the name of the property.
+     * @param indentLevel the current indent level, where 0 is no indent.
+     * @param type the type of property. E.g. `field`, `method`.
+     */
     public void appendObjProp(StringBuilder msg, String resStr, String propName, int indentLevel, String type) {
         msg.append(String.format("\n%s", getIndent(indentLevel)));
         if (resStr != null) {
@@ -39,6 +52,17 @@ public class CommandTargetData extends Command {
         }
     }
 
+    /**
+     * Return a string of what is to be logged for a given object. The first character is a carriage return.
+     *
+     * @param obj the object to log.
+     * @param indentLevel the current indent level, where 0 is no indent.
+     * @param targetPropertyNames a HashSet of the names of each property (field or method) to be logged, or null if no
+     *                            filter is to be applied.
+     * @param detailed `true` if the logs should be detailed, `false` otherwise.
+     * @return The string of what is to be logged.
+     * @param <T>the object's class.
+     */
     public <T> String logData(T obj, int indentLevel, HashSet<String> targetPropertyNames, boolean detailed) {
         StringBuilder msg = new StringBuilder();
         Class clazz = obj.getClass();
@@ -78,6 +102,16 @@ public class CommandTargetData extends Command {
         return msg.toString();
     }
 
+    /**
+     * Log the data of a given object through this mod's logger and through the game's chat.
+     *
+     * @param obj the object to log.
+     * @param name the name of the category of search. E.g. `entity`, `block`.
+     * @param targetPropertyNames A HashSet of the names of each property (field or method) to be logged, or null if no
+     *                            filter is to be applied.
+     * @param detailed `true` if the logs should be detailed, `false` otherwise.
+     * @param <T> the object's class.
+     */
     public <T> void logDataOf(T obj, String name, HashSet<String> targetPropertyNames, boolean detailed) {
         if (obj == null) {
             Constants.LOGGER.info("No {} found!", name);
