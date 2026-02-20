@@ -35,11 +35,11 @@ public class CommandTargetData extends Command {
      * @param indentLevel the current indent level, where 0 is no indent.
      * @param type the type of property. E.g. `field`, `method`.
      */
-    public void appendObjProp(StringBuilder msg, String resStr, String propName, int indentLevel, String type) {
+    public void appendObjProp(StringBuilder msg, String resStr, String propName, String separator, int indentLevel, String type) {
         msg.append(String.format("\n%s", getIndent(indentLevel)));
         if (resStr != null) {
             String[] res = String.valueOf(resStr).split("\n");
-            msg.append(String.format("%s -> ", propName));
+            msg.append(String.format("%s %s ", propName, separator));
             if (res.length < 2) {
                 msg.append(res[0]);
             } else {
@@ -61,7 +61,7 @@ public class CommandTargetData extends Command {
      *                            filter is to be applied.
      * @param detailed `true` if the logs should be detailed, `false` otherwise.
      * @return The string of what is to be logged.
-     * @param <T>the object's class.
+     * @param <T> the object's class.
      */
     public <T> String logData(T obj, int indentLevel, HashSet<String> targetPropertyNames, boolean detailed) {
         StringBuilder msg = new StringBuilder();
@@ -79,7 +79,7 @@ public class CommandTargetData extends Command {
                     res = String.valueOf(field.get(obj));
                 } catch (IllegalAccessException _) {
                 }
-                appendObjProp(msg, res, field.getName(), subIndentLevel, "field");
+                appendObjProp(msg, res, field.getName(), ":", subIndentLevel, "field");
             }
             for (Method method : clazz.getDeclaredMethods()) {
                 if (targetPropertyNames != null && !targetPropertyNames.contains(method.getName().toLowerCase())) { continue; }
@@ -90,7 +90,7 @@ public class CommandTargetData extends Command {
                     method.setAccessible(true);
                     res = String.valueOf(method.invoke(obj));
                 } catch (IllegalAccessException | InvocationTargetException _) { }
-                appendObjProp(msg, res, method.getName(), subIndentLevel, "method");
+                appendObjProp(msg, res, method.getName(), "->", subIndentLevel, "method");
             }
             if (detailed) {
                 msg.append(String.format("\n%s}", getIndent(indentLevel)));
