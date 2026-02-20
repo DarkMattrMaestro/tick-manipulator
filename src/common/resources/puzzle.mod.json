@@ -4,7 +4,7 @@
   "version": "${p_version}",
   "display_name": "Tick Manipulator",
   "name": "Tick Manipulator",
-  "description": "Manually step ticks with ease.",
+  "description": "${p_desc}",
   "authors": [
     "DarkMattrMaestro"
   ],
@@ -26,7 +26,7 @@
   },
   "allowedSides": {
     "client": true,
-    "server": false
+    "server": true
   },
   "mixins": [
     "tick_manipulator.mixins.json",

@@ -1,5 +1,5 @@
 > [!NOTE]
-> Updated to Cosmic Reach Alpha v0.5.10
+> Updated to Cosmic Reach Alpha v0.5.16
 
 # Tick Manipulator
 This mod adds commands and keybinds that make analysing Cosmic Reach tick-by-tick easier.
@@ -9,9 +9,7 @@ Stepping:
 - `<Page Up>` to go to step forward one tick when ticking is frozen.
 
 ## Command Information
-All tick commands take the general form `/tick {action} {arg1} {arg2} {...}`.
-
-Help
+Help:
 - `/tick help` to get this help command.
 
 Resetting:
@@ -31,9 +29,14 @@ Delaying:
 - `/tick delay {delay in milliseconds}` to wait the given number of milliseconds before each tick.
   E.g. `/tick delay 1000` waits one second before each tick.
 
-Notes:
-- Stepping and Delaying are mutually exclusive. Stepping can only be used when ticking is frozen,
+> [!NOTE]
+> Stepping and Delaying are mutually exclusive. Stepping can only be used when ticking is frozen,
   while delaying requires ticking to be unfrozen.
+
+Repeating:
+- `/tick repeat add {command}` to add a command to the list of commands run every tick.
+  E.g. `/tick repeat add data simple entity velocity` logs the nearest entity's velocity every tick.
+- `/tick repeat clear` to clear the list of commands run every tick.
 
 Highlighting:
 - `/highlight {particles|entities} {true|false}` to make either particles or entities visible
@@ -44,9 +47,21 @@ Highlighting:
   that particles are purely visual components (mostly used by projectile entities). *Defaults to true.*
 
 Data Querying:
-- `/data` to get data about the block that is in the current line of sight (up to 100 blocks away).
-  Key-data pairs that are separated by a colon (e.g. `chunk : (97, 2, 34)`) represent fields.
+- `/data {simple|} {block|entity} {comma separated properties|}` to get data about a block that 
+  is in the current line of sight (up to 100 blocks away) or the nearest entity (excluding players).
+  The first argument (optional), `simple`, produces a simpler output.
+  The third argument (optional) is a comma-separated list of the properties to show. If no properties
+  are specified, all are shown.
+  Key-data pairs separated by a colon (e.g. `chunk : (97, 2, 34)`) represent fields.
   Key-data pairs separated by an arrow (e.g. `getCenterY -> 32.5`) represent parameterless methods.
+  <br>E.g. `/data simple entity velocity,ENTITY_TYPE_ID,position,tags` can produce:
+  ```
+  [TickManipulator] Data of EntityProjectileLaser@2a075e70 :
+  ENTITY_TYPE_ID -> base:laser_projectile
+  position -> (1370.9503,43.58916,580.04724)
+  velocity -> (42.55051,-42.276836,1.4571363)
+  tags -> [projectile_immune,fire_immune,no_entity_push,no_buoyancy]
+  ```
 
 ## Dependencies:
 - Puzzle Loader
