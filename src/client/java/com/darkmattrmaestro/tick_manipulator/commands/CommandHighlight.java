@@ -1,7 +1,8 @@
 package com.darkmattrmaestro.tick_manipulator.commands;
 
 import com.darkmattrmaestro.tick_manipulator.Constants;
-import com.darkmattrmaestro.tick_manipulator.Highlight;
+import com.darkmattrmaestro.tick_manipulator.Highlight.Highlight;
+import com.darkmattrmaestro.tick_manipulator.PerWorldClientSingletons;
 import finalforeach.cosmicreach.chat.IChat;
 import finalforeach.cosmicreach.chat.commands.Command;
 
@@ -105,8 +106,41 @@ public class CommandHighlight extends Command {
                 }
                 break;
             }
+            case "blocks": {
+                if (!this.hasNextArg()) {
+                    if (PerWorldClientSingletons.blockHighlight.properties.isEmpty()) {
+                        sendMsg("No highlighted blocks.");
+                    } else {
+                        StringBuilder str = new StringBuilder();
+                        for (String key: PerWorldClientSingletons.blockHighlight.properties.keySet()) {
+                            str.append(key);
+                            str.append("=");
+                            str.append(PerWorldClientSingletons.blockHighlight.properties.get(key));
+                            str.append(",");
+                        }
+                        str.deleteCharAt(str.length() - 1);
+                        sendMsg(str.toString());
+                    }
+                } else {
+                    String value = this.getNextArg();
+                    if ("clear".equalsIgnoreCase(value)) {
+                        PerWorldClientSingletons.blockHighlight.clear();
+                        break;
+                    }
+
+                    String[] blockStateStrings = value.split(",");
+                    for (String blockStateStr: blockStateStrings) {
+                        String[] blockStateKeyValue = blockStateStr.split("=");
+                        if (blockStateKeyValue.length < 2) { continue; }
+
+                        PerWorldClientSingletons.blockHighlight.setPropertyCondition(blockStateKeyValue[0], blockStateKeyValue[1]);
+                    }
+                }
+
+                break;
+            }
             default: {
-                sendMsg("Incorrect argument provided! The first argument must be one of `particles` or `entities`.");
+                sendMsg("Incorrect argument provided! The first argument must be one of `particles`, `entities` or `blocks`.");
                 break;
             }
         }

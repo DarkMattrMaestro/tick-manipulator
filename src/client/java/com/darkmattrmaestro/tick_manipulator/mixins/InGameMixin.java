@@ -4,10 +4,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
-import com.darkmattrmaestro.tick_manipulator.Highlight;
+import com.darkmattrmaestro.tick_manipulator.Constants;
+import com.darkmattrmaestro.tick_manipulator.Highlight.Highlight;
+import com.darkmattrmaestro.tick_manipulator.PerWorldClientSingletons;
 import com.darkmattrmaestro.tick_manipulator.PerWorldSingletons;
 import com.darkmattrmaestro.tick_manipulator.utils.TickManipulatorInputProcessor;
+import com.darkmattrmaestro.tick_manipulator.utils.Vector3Int;
 import finalforeach.cosmicreach.TickRunner;
 import finalforeach.cosmicreach.entities.Entity;
 import finalforeach.cosmicreach.entities.player.Player;
@@ -18,6 +22,7 @@ import finalforeach.cosmicreach.singletons.GameSingletons;
 import finalforeach.cosmicreach.world.Zone;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -34,6 +39,9 @@ public class InGameMixin {
     @Shadow
     InputProcessor inputMultiplexer;
 
+    @Unique
+    private static ShapeRenderer tickManipulator$sr;
+
     @Inject(method = "create", at = @At(value = "TAIL"))
     public void create(CallbackInfo ci) {
         InputMultiplexer multiplexer = new InputMultiplexer();
@@ -49,6 +57,10 @@ public class InGameMixin {
      * @param playerZone the zone in which is situated the player.
      */
     protected void renderHighlight(Zone playerZone) {
+        if (tickManipulator$sr == null) {
+            tickManipulator$sr = new ShapeRenderer();
+        }
+
 //        boolean usePostProcessing = false;
 //        boolean useUnderwaterPostProcessing = false;
 //        boolean useUnderLavaPostProcessing = false;
@@ -100,6 +112,13 @@ public class InGameMixin {
 //            }
 //        }
 
+//        for (Vector3Int pos: PerWorldClientSingletons.blockHighlight.highlightedBlocks) {
+//            Constants.LOGGER.warn(pos);
+//        }
+        if (Highlight.highlightBlocks) {
+            PerWorldClientSingletons.blockHighlight.draw(tickManipulator$sr);
+        }
+
         if (Highlight.highlightEntities) {
             Array<Entity> entities = playerZone.getAllEntities();
 
@@ -129,7 +148,8 @@ public class InGameMixin {
 
     @Inject(method = "switchAwayTo(Lfinalforeach/cosmicreach/gamestates/GameState;)V", at = @At(value = "INVOKE", target = "Lfinalforeach/cosmicreach/chat/Chat;clear()V"))
     public void onWorldExit(GameState gameState, CallbackInfo ci) {
-        PerWorldSingletons.repeatCalls.clear();
+        PerWorldSingletons.clear();
+        PerWorldClientSingletons.clear();
     }
 
     @Inject(method = "render", at = @At(value = "TAIL"))

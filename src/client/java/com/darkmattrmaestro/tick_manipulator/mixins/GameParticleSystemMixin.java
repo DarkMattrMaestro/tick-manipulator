@@ -2,7 +2,7 @@ package com.darkmattrmaestro.tick_manipulator.mixins;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
-import com.darkmattrmaestro.tick_manipulator.Highlight;
+import com.darkmattrmaestro.tick_manipulator.Highlight.Highlight;
 import com.darkmattrmaestro.tick_manipulator.interfaces.IMixinGameParticleSystem;
 import finalforeach.cosmicreach.particles.GameParticleSystem;
 import finalforeach.cosmicreach.particles.components.IParticleComponent;

@@ -3,6 +3,7 @@ package com.darkmattrmaestro.tick_manipulator.commands;
 import com.darkmattrmaestro.tick_manipulator.Constants;
 import com.darkmattrmaestro.tick_manipulator.utils.BlockSelectionUtil;
 import com.darkmattrmaestro.tick_manipulator.utils.EntitySelectionUtil;
+import finalforeach.cosmicreach.blocks.BlockPosition;
 import finalforeach.cosmicreach.chat.IChat;
 import finalforeach.cosmicreach.chat.commands.Command;
 
@@ -48,7 +49,7 @@ public class CommandTargetData extends Command {
                 }
             }
         } else {
-            msg.append(String.format("%s :\\ No access to %s!", propName, type));
+            msg.append(String.format("%s %s \\ No access to %s!", propName, separator, type));
         }
     }
 
@@ -153,7 +154,11 @@ public class CommandTargetData extends Command {
             }
 
             if ("block".equals(targetType)) {
-                logDataOf(BlockSelectionUtil.getBlockLookingAtFar(100), "block", targetPropertyNames, detailed);
+                BlockPosition blockPos = BlockSelectionUtil.getBlockLookingAtFar(100);
+                logDataOf(blockPos, "block", targetPropertyNames, detailed);
+                if (blockPos != null) {
+                    logDataOf(blockPos.getBlockState(), "blockState", targetPropertyNames, detailed);
+                }
             } else if ("entity".equals(targetType)) {
                 logDataOf(EntitySelectionUtil.getNearestEntityToPlayer(), "entity", targetPropertyNames, detailed);
             } else {

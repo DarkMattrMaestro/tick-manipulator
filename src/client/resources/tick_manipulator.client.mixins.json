@@ -5,7 +5,9 @@
   "compatibilityLevel": "JAVA_24",
   "mixins": [
     "InGameMixin",
-    "GameParticleSystemMixin"
+    "GameParticleSystemMixin",
+    "ClientBlockEventsMixin",
+    "BlockEventTriggerMixin"
   ],
   "client": [
   ],

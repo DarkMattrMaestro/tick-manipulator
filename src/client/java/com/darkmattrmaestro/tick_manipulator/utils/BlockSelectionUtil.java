@@ -10,6 +10,7 @@ import finalforeach.cosmicreach.blocks.BlockPosition;
 import finalforeach.cosmicreach.blocks.BlockState;
 import finalforeach.cosmicreach.gamestates.GameState;
 import finalforeach.cosmicreach.gamestates.InGame;
+import finalforeach.cosmicreach.ui.UI;
 
 /**
  * The <code>BlockSelectionUtil</code> provides utility functions that relate to the determination of the currently selected block.
