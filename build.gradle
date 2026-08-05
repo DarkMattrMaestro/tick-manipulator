@@ -58,6 +58,12 @@ wrapper {
     distributionType = Wrapper.DistributionType.ALL
 }
 
+tasks.buildMergedJar {
+    archiveBaseName = project.name + "-CR" + project.cosmic_reach_version.replace("-alpha", "")
+    archiveVersion = version
+    archiveClassifier = ''
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(24)
