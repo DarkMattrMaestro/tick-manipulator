@@ -7,7 +7,8 @@
     "InGameMixin",
     "GameParticleSystemMixin",
     "ClientBlockEventsMixin",
-    "BlockEventTriggerMixin"
+    "BlockEventTriggerMixin",
+    "DynamicSkyMixin"
   ],
   "client": [
   ],

@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
 import com.darkmattrmaestro.tick_manipulator.PerWorldSingletons;
 import com.darkmattrmaestro.tick_manipulator.interfaces.IMixinZone;
-import finalforeach.cosmicreach.RandomTicks;
+import finalforeach.cosmicreach.world.RandomTicks;
 import finalforeach.cosmicreach.blocks.blockentities.BlockEntity;
 import finalforeach.cosmicreach.gameevents.blockevents.ScheduledBlockTrigger;
 import finalforeach.cosmicreach.entities.*;
@@ -21,6 +21,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.PriorityQueue;
 import java.util.concurrent.TimeUnit;
@@ -90,13 +91,13 @@ public class ZoneMixin implements Json.Serializable, Disposable, IMixinZone {
     public void runScheduledTriggers() {}
 
     @Shadow
-    public void despawnEntity(Entity entity) {}
+    public void despawnEntity(GameEntity entity) {}
 
     @Shadow
-    public Array<Entity> getAllEntities() { return null; }
+    public Array<GameEntity> getAllEntities() { return null; }
 
     @Unique void updatePlayerEntities(float deltaTime) {
-        ArrayUtils.forEach(this.getAllEntities().toArray(Entity.class), (Entity e) -> {
+        ArrayUtils.forEach(this.getAllEntities().toArray(GameEntity.class), (GameEntity e) -> {
             if (!"base:entity_player".equals(e.entityTypeId)) {
                 return;
             }
@@ -186,5 +187,35 @@ public class ZoneMixin implements Json.Serializable, Disposable, IMixinZone {
 
     @Shadow
     public void read(Json json, JsonValue jsonValue) {}
+
+    @Unique
+    private float savedSkyTimeSeconds;
+    @Unique
+    private boolean isSkyFrozen = false;
+
+    @Unique
+    public void setIsSkyFrozen(boolean isSkyFrozen) {
+        this.isSkyFrozen = isSkyFrozen;
+    }
+
+    @Unique
+    public boolean setIsSkyFrozen() {
+        return this.isSkyFrozen;
+    }
+
+    @Shadow
+    public long getCurrentWorldTick() {
+        return this.world.getCurrentWorldTick();
+    }
+
+    @Inject(method = "getCurrentSkyTime", at = @At(value = "HEAD"), cancellable = true)
+    public void getCurrentSkyTime(CallbackInfoReturnable<Float> cir) {
+        if (isSkyFrozen) {
+            cir.setReturnValue(this.savedSkyTimeSeconds);
+        } else {
+            this.savedSkyTimeSeconds = (float)this.getCurrentWorldTick() * 0.05F;
+            cir.setReturnValue(this.savedSkyTimeSeconds);
+        }
+    }
 }
 

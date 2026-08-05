@@ -1,5 +1,7 @@
 package com.darkmattrmaestro.tick_manipulator.interfaces;
 
+import org.spongepowered.asm.mixin.Unique;
+
 public interface IMixinZone {
     boolean getFrozen();
     void setFrozen(boolean state);
@@ -9,4 +11,8 @@ public interface IMixinZone {
 
     int getTickDelay();
     void setTickDelay(int delay);
+
+    void setIsSkyFrozen(boolean isSkyFrozen);
+
+    boolean setIsSkyFrozen();
 }

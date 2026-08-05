@@ -31,7 +31,6 @@ public class BlockEventTriggerMixin extends GameEventTrigger<BlockEventArgs, IBl
 
     @Inject(method = "act", at = @At(value = "TAIL"), cancellable = false)
     public void actMixin(BlockEventArgs args, CallbackInfo ci) {
-        Constants.LOGGER.warn("Activated! {}", args.blockPos);
         PerWorldClientSingletons.blockHighlight.updateHighlightedBlockList((BlockPosition) args.blockPos);
     }
 }

@@ -2,7 +2,7 @@ package com.darkmattrmaestro.tick_manipulator.utils;
 
 import com.badlogic.gdx.math.Vector3;
 import com.darkmattrmaestro.tick_manipulator.Constants;
-import finalforeach.cosmicreach.entities.Entity;
+import finalforeach.cosmicreach.entities.GameEntity;
 import finalforeach.cosmicreach.gamestates.InGame;
 import finalforeach.cosmicreach.util.ArrayUtils;
 
@@ -14,11 +14,11 @@ public class EntitySelectionUtil {
      *
      * @return the nearest entity to the player that is not a player.
      */
-    public static Entity getNearestEntityToPlayer() {
+    public static GameEntity getNearestEntityToPlayer() {
         Vector3 playerPos = InGame.getLocalPlayer().getPosition();
-        AtomicReference<Entity> entity = new AtomicReference<>();
+        AtomicReference<GameEntity> entity = new AtomicReference<>();
         AtomicReference<Float> closest = new AtomicReference<Float>(-1f);
-        ArrayUtils.forEach(InGame.getLocalPlayer().getZone().getAllEntities().toArray(Entity.class), (Entity e) -> {
+        ArrayUtils.forEach(InGame.getLocalPlayer().getZone().getAllEntities().toArray(GameEntity.class), (GameEntity e) -> {
             if ("base:entity_player".equals(e.entityTypeId)) { return; }
 
             float dist2 = e.position.dst2(playerPos);

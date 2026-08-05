@@ -3,8 +3,11 @@ package com.darkmattrmaestro.tick_manipulator.commands;
 import com.darkmattrmaestro.tick_manipulator.Constants;
 import com.darkmattrmaestro.tick_manipulator.Highlight.Highlight;
 import com.darkmattrmaestro.tick_manipulator.PerWorldClientSingletons;
+import com.darkmattrmaestro.tick_manipulator.imguiStuff.HighlightWindow;
+import com.darkmattrmaestro.tick_manipulator.imguiStuff.TestWindow;
 import finalforeach.cosmicreach.chat.IChat;
 import finalforeach.cosmicreach.chat.commands.Command;
+import org.tympanic.imgui_integration.imgui.ImGuiManager;
 
 import static com.darkmattrmaestro.tick_manipulator.utils.ChatUtils.sendMsg;
 
@@ -13,12 +16,14 @@ public class CommandHighlight extends Command {
     public void run(IChat chat) {
         super.run(chat);
 
-        if (!this.hasNextArg()) {
-            sendMsg("No arguments provided! Try `/highlight {particles|entities} {true|false}`.");
-            return;
-        }
+//        if (!this.hasNextArg()) {
+//            sendMsg("No arguments provided! Try `/highlight {particles|entities} {true|false}`.");
+//            return;
+//        }
 
-        String action = this.getNextArg().toLowerCase();
+//        String action = this.getNextArg().toLowerCase();
+        ImGuiManager.INSTANCE.windows.add(new HighlightWindow());
+        /*
         switch (action) {
             case "particles": {
                 if (!this.hasNextArg()) {
@@ -144,6 +149,7 @@ public class CommandHighlight extends Command {
                 break;
             }
         }
+        */
     }
 
     public String getShortDescription() {

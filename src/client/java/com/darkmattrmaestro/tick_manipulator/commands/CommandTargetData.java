@@ -1,11 +1,14 @@
 package com.darkmattrmaestro.tick_manipulator.commands;
 
 import com.darkmattrmaestro.tick_manipulator.Constants;
+import com.darkmattrmaestro.tick_manipulator.imguiStuff.DataWindow;
+import com.darkmattrmaestro.tick_manipulator.imguiStuff.HighlightWindow;
 import com.darkmattrmaestro.tick_manipulator.utils.BlockSelectionUtil;
 import com.darkmattrmaestro.tick_manipulator.utils.EntitySelectionUtil;
 import finalforeach.cosmicreach.blocks.BlockPosition;
 import finalforeach.cosmicreach.chat.IChat;
 import finalforeach.cosmicreach.chat.commands.Command;
+import org.tympanic.imgui_integration.imgui.ImGuiManager;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -137,34 +140,36 @@ public class CommandTargetData extends Command {
     public void run(IChat chat) {
         super.run(chat);
 
-        if (!this.hasNextArg()) {
-            logDataOf(BlockSelectionUtil.getBlockLookingAtFar(100), "block", null, true);
-        } else {
-            String targetType = this.getNextArg().toLowerCase();
+        ImGuiManager.INSTANCE.windows.add(new DataWindow());
 
-            boolean detailed = true;
-            if ("simple".equals(targetType)) {
-                detailed = false;
-                targetType = this.getNextArg().toLowerCase();
-            }
-
-            HashSet<String> targetPropertyNames = null;
-            if (this.hasNextArg()) {
-                targetPropertyNames = new HashSet<String>(List.of(this.getNextArg().toLowerCase().split(",")));
-            }
-
-            if ("block".equals(targetType)) {
-                BlockPosition blockPos = BlockSelectionUtil.getBlockLookingAtFar(100);
-                logDataOf(blockPos, "block", targetPropertyNames, detailed);
-                if (blockPos != null) {
-                    logDataOf(blockPos.getBlockState(), "blockState", targetPropertyNames, detailed);
-                }
-            } else if ("entity".equals(targetType)) {
-                logDataOf(EntitySelectionUtil.getNearestEntityToPlayer(), "entity", targetPropertyNames, detailed);
-            } else {
-                sendMsg("Invalid command arguments.");
-            }
-        }
+//        if (!this.hasNextArg()) {
+//            logDataOf(BlockSelectionUtil.getBlockLookingAtFar(100), "block", null, true);
+//        } else {
+//            String targetType = this.getNextArg().toLowerCase();
+//
+//            boolean detailed = true;
+//            if ("simple".equals(targetType)) {
+//                detailed = false;
+//                targetType = this.getNextArg().toLowerCase();
+//            }
+//
+//            HashSet<String> targetPropertyNames = null;
+//            if (this.hasNextArg()) {
+//                targetPropertyNames = new HashSet<String>(List.of(this.getNextArg().toLowerCase().split(",")));
+//            }
+//
+//            if ("block".equals(targetType)) {
+//                BlockPosition blockPos = BlockSelectionUtil.getBlockLookingAtFar(100);
+//                logDataOf(blockPos, "block", targetPropertyNames, detailed);
+//                if (blockPos != null) {
+//                    logDataOf(blockPos.getBlockState(), "blockState", targetPropertyNames, detailed);
+//                }
+//            } else if ("entity".equals(targetType)) {
+//                logDataOf(EntitySelectionUtil.getNearestEntityToPlayer(), "entity", targetPropertyNames, detailed);
+//            } else {
+//                sendMsg("Invalid command arguments.");
+//            }
+//        }
     }
 
     public String getShortDescription() {

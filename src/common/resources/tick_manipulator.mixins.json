@@ -4,7 +4,8 @@
   "package": "com.darkmattrmaestro.tick_manipulator.mixins",
   "compatibilityLevel": "JAVA_24",
   "mixins": [
-    "ZoneMixin"
+    "ZoneMixin",
+    "CommandTimeMixin"
   ],
   "injectors": {
     "defaultRequire": 1

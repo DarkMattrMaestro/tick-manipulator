@@ -14,13 +14,14 @@ import finalforeach.cosmicreach.blocks.BlockState;
 import finalforeach.cosmicreach.gamestates.GameState;
 import finalforeach.cosmicreach.gamestates.InGame;
 import com.badlogic.gdx.graphics.Camera;
-import finalforeach.cosmicreach.util.Axis;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 
 public class BlockHighlight {
+    private static boolean enabled = false;
+
     private static final float inflate = -0.05f;
     private static final float ARROW_TAIL_LENGTH = 0.64f;
     private static final float ARROW_HEAD_LENGTH = 0.3f;
@@ -91,8 +92,7 @@ public class BlockHighlight {
     }
 
     public void updateHighlightedBlockList(BlockPosition blockPos) {
-        Constants.LOGGER.warn(highlightedBlocks.size());
-        if (blockPos == null) {
+        if (blockPos == null || !enabled) {
             return;
         }
 
@@ -120,13 +120,14 @@ public class BlockHighlight {
     }
 
     public void draw(ShapeRenderer sr) {
+        if (!enabled) { return; }
+
         Camera camera = GameState.IN_GAME.getWorldCamera();
         sr.setProjectionMatrix(camera.combined);
 
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
-        Constants.LOGGER.warn(highlightedBlocks.size());
         for (DirectionVector3 dirVec: highlightedBlocks.toArray(DirectionVector3[]::new)) {
             Vector3 floatPos = dirVec.pos.toVector3();
             float width = 1 + 2 * inflate;

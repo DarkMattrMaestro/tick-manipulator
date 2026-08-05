@@ -13,12 +13,13 @@ import com.darkmattrmaestro.tick_manipulator.PerWorldSingletons;
 import com.darkmattrmaestro.tick_manipulator.utils.TickManipulatorInputProcessor;
 import com.darkmattrmaestro.tick_manipulator.utils.Vector3Int;
 import finalforeach.cosmicreach.TickRunner;
-import finalforeach.cosmicreach.entities.Entity;
+import finalforeach.cosmicreach.entities.GameEntity;
 import finalforeach.cosmicreach.entities.player.Player;
 import finalforeach.cosmicreach.gamestates.GameState;
 import finalforeach.cosmicreach.gamestates.InGame;
 import finalforeach.cosmicreach.rendering.GameParticleRenderer;
 import finalforeach.cosmicreach.singletons.GameSingletons;
+import finalforeach.cosmicreach.world.Sky;
 import finalforeach.cosmicreach.world.Zone;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -119,11 +120,19 @@ public class InGameMixin {
             PerWorldClientSingletons.blockHighlight.draw(tickManipulator$sr);
         }
 
+//        GameEntity[] entitiesDel = playerZone.getAllEntities().toArray();
+//        for (GameEntity e: entitiesDel) {
+//            if (!"base:entity_player".equalsIgnoreCase(e.entityTypeId)) {
+//                e.die(playerZone);
+//            }
+//        }
+
+
         if (Highlight.highlightEntities) {
-            Array<Entity> entities = playerZone.getAllEntities();
+            Array<GameEntity> entities = playerZone.getAllEntities();
 
             for (int i = 0; i < entities.size; ++i) {
-                Entity e = (Entity) entities.get(i);
+                GameEntity e = (GameEntity) entities.get(i);
                 if (e != null) {
                     e.render(rawWorldCamera);
                     e.clientUpdate();
@@ -133,7 +142,7 @@ public class InGameMixin {
 
 //        this.blockSelection.render(rawWorldCamera);
         if (Highlight.highlightParticles) {
-            this.gameParticles.render(rawWorldCamera, !TickRunner.INSTANCE.isRunning() && GameSingletons.isHost ? 0.0F : Gdx.graphics.getDeltaTime());
+            this.gameParticles.render(rawWorldCamera, !TickRunner.INSTANCE.isRunning() && GameSingletons.isHost() ? 0.0F : Gdx.graphics.getDeltaTime());
         }
 
 //        if (usePostProcessing) {
@@ -161,4 +170,9 @@ public class InGameMixin {
             }
         }
     }
+
+//    @Inject(method = "renderWorld", at = @At(value = "INVOKE", target = "Lfinalforeach/cosmicreach/world/Sky;update()V"))
+//    public void renderWorld(Zone playerZone, CallbackInfo ci) {
+//        Sky.getCurrentSky(playerZone).update();
+//    }
 }

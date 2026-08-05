@@ -17,9 +17,11 @@ public class Constants {
     public static final Identifier MOD_NAME = Identifier.of(MOD_ID, "TickManipulator");
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
-    public static Consumer<String> relevantChatSender = GameSingletons.isClient ?
+    public static Consumer<String> relevantChatSender = GameSingletons.isClient() ?
             (String msg) -> Chat.MAIN_CLIENT_CHAT.addMessage(null, msg) :
             (String msg) -> ServerSingletons.SERVER.broadcastToAll(new MessagePacket(msg));
+
+    public static Runnable clientTickGUISpawner = () -> {};
 
     public static final HashSet<String> POSITIVES = new HashSet<String>(Arrays.asList("true", "yes", "on"));
     public static final HashSet<String> NEGATIVES = new HashSet<String>(Arrays.asList("false", "no", "off"));

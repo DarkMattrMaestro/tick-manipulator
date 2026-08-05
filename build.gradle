@@ -6,17 +6,6 @@ plugins {
 group = p_group
 version = p_version
 
-//loom {
-//    splitEnvironmentSourceSets()
-//    mods {
-//        "${id}" {
-//            sourceSet sourceSets.main
-//            sourceSet sourceSets.client
-//        }
-//    }
-////    accessWidenerPath = file("src/main/resources/${id}.manipulator")
-//}
-
 jigsawGame {
     splitSourceSets()
 }
@@ -25,27 +14,13 @@ jigsawAccess {
     addManipulators(file("$projectDir/src/common/resources/${p_id}.manipulator"))
 }
 
-jigsawInject {
-    setModJson(file("$projectDir/src/common/resources/puzzle.mod.json"))
-}
-
 repositories {
     mavenCentral()
     mavenLocal()
+    maven {
+        url = "https://jitpack.io"
+    }
 }
-
-
-//repositories {
-//    mavenCentral()
-//    maven {
-//        name = 'Jitpack'
-//        url = "https://jitpack.io"
-//    }
-//    maven {
-//        name = 'MixinSquared'
-//        url = "https://maven.bawnorton.com/releases"
-//    }
-//}
 
 dependencies {
     puzzleLoader "dev.puzzleshq:puzzle-loader-core:$puzzle_loader_core_version"
@@ -53,31 +28,8 @@ dependencies {
 
     cosmicReach("finalforeach:cosmic-reach:${cosmic_reach_version}")
 
-//    commonImplementation "com.github.PuzzlesHQ:cosmic-api:${cosmic_api_version}"
+    clientImplementation("com.github.DarkMattrMaestro:imgui-integration:${imgui_integration_version}")
 }
-
-//processResources {
-//    def resourceTargets = [ "puzzle.mod.json" ]
-//
-//    // Left item is the name in the target, right is the variable name
-//    def replaceProperties = [
-//            "mod_version"     : project.version,
-//            "mod_desc"        : desc,
-//            "mod_group"       : project.group,
-//            "mod_name"        : rootProject.name,
-//            "mod_id"          : id,
-//            "cr_version"    : cosmic_reach_version,
-//            "puzzle_loader_cosmic"    : puzzle_cosmic_version,
-//            "puzzle_loader_core"      : puzzle_core_version
-//    ]
-//
-//
-//    inputs.properties replaceProperties
-//    replaceProperties.put "project", project
-//    filesMatching(resourceTargets) {
-//        expand replaceProperties
-//    }
-//}
 
 processCommonResources {
     def projectProperties = [

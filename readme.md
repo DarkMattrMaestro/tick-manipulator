@@ -18,6 +18,8 @@ Resetting:
 Freezing:
 - `/tick freeze` to freeze the game's ticking.
 - `/tick unfreeze` to unfreeze the game's ticking.
+- `/time freeze` to freeze the sky.
+- `/time unfreeze` to unfreeze the sky.
 
 Stepping:
 - `/tick step` to step to the next tick.

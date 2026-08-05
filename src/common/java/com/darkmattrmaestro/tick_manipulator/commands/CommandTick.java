@@ -5,6 +5,11 @@ import com.darkmattrmaestro.tick_manipulator.PerWorldSingletons;
 import com.darkmattrmaestro.tick_manipulator.utils.ZoneTickingUtils;
 import finalforeach.cosmicreach.chat.IChat;
 import finalforeach.cosmicreach.chat.commands.Command;
+import finalforeach.cosmicreach.networking.NetworkIdentity;
+import finalforeach.cosmicreach.networking.server.ServerBroadcastIdentity;
+import finalforeach.cosmicreach.networking.server.ServerNetworkManager;
+import finalforeach.cosmicreach.networking.server.ServerSingletons;
+import finalforeach.cosmicreach.singletons.GameSingletons;
 
 import static com.darkmattrmaestro.tick_manipulator.utils.ChatUtils.sendMsg;
 
@@ -16,6 +21,9 @@ public class CommandTick extends Command {
             
             Help
             - '/tick help' to get this help command.
+            
+            GUI
+            - '/tick gui' to display the encompassing GUI for the Tick Manipulator mod.
             
             Resetting:
             - '/tick reset' to reset all ticking modifiers to the vanilla default (unfrozen, no delay).
@@ -124,6 +132,10 @@ public class CommandTick extends Command {
         }
     }
 
+    public static void display(IChat chat) {
+
+    }
+
     public void run(IChat chat) {
         super.run(chat);
 
@@ -169,6 +181,19 @@ public class CommandTick extends Command {
                     sendMsg("The command must be of the form /tick delay {delay in milliseconds}");
                 }
                 break;
+            }
+            case "gui": {
+                if (!GameSingletons.isClient()) {
+                    sendMsg("This command is only valid for clients!");
+                }
+
+                Constants.clientTickGUISpawner.run();
+
+//                Constants.LOGGER.warn(GameSingletons.client());
+//
+//                GameSingletons.client().sendAsClient(new TickGUIPacket());
+
+//                (new TickGUIPacket()).setupAndSend(ServerSingletons.getConnection(this.getCallingPlayer()));
             }
             default: {
                 sendMsg("Unrecognized tick action! Type `/tick help` for a list of valid commands.");
