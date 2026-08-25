@@ -41,13 +41,8 @@ Repeating:
 - `/tick repeat clear` to clear the list of commands run every tick.
 
 Highlighting:
-- `/highlight` to show a GUI with option for highlighting, as an alternative to the commands.
-- `/highlight {particles|entities} {true|false}` to make either particles or entities visible
-  through blocks. E.g. `/highlight particles true` makes particles (such as laser projectile
-  entities' particles) visible through blocks. *Defaults to false.*
-- `/highlight persist-particles {true|false}` to make particles persist past their normal lifetime.
-  This is especially useful when ticks are frozen since particle lifetimes are tick-independent. Note
-  that particles are purely visual components (mostly used by projectile entities). *Defaults to true.*
+- `/highlight` to show a GUI with options for highlighting entities (*Defaults to false*) and particles
+  (*Defaults to false*), as well as persisting particles (*Defaults to true*).
 
 Data Querying:
 - `/data` to get exhaustive data about a specific block that is in the current line of sight (up to 100
