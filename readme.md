@@ -41,6 +41,7 @@ Repeating:
 - `/tick repeat clear` to clear the list of commands run every tick.
 
 Highlighting:
+- `/highlight` to show a GUI with option for highlighting, as an alternative to the commands.
 - `/highlight {particles|entities} {true|false}` to make either particles or entities visible
   through blocks. E.g. `/highlight particles true` makes particles (such as laser projectile
   entities' particles) visible through blocks. *Defaults to false.*
@@ -49,25 +50,17 @@ Highlighting:
   that particles are purely visual components (mostly used by projectile entities). *Defaults to true.*
 
 Data Querying:
-- `/data {simple|} {block|entity} {comma separated properties|}` to get data about a block that 
-  is in the current line of sight (up to 100 blocks away) or the nearest entity (excluding players).
-  The first argument (optional), `simple`, produces a simpler output.
-  The third argument (optional) is a comma-separated list of the properties to show. If no properties
-  are specified, all are shown.
+- `/data` to get exhaustive data about a specific block that is in the current line of sight (up to 100
+  blocks away) or the nearest entity (excluding players).
   Key-data pairs separated by a colon (e.g. `chunk : (97, 2, 34)`) represent fields.
-  Key-data pairs separated by an arrow (e.g. `getCenterY -> 32.5`) represent parameterless methods.
-  <br>E.g. `/data simple entity velocity,ENTITY_TYPE_ID,position,tags` can produce:
-  ```
-  [TickManipulator] Data of EntityProjectileLaser@2a075e70 :
-  ENTITY_TYPE_ID -> base:laser_projectile
-  position -> (1370.9503,43.58916,580.04724)
-  velocity -> (42.55051,-42.276836,1.4571363)
-  tags -> [projectile_immune,fire_immune,no_entity_push,no_buoyancy]
-  ```
+  Key-data pairs separated by an arrow (e.g. `getCenterY() -> 32.5`) represent parameterless methods. Note that these
+  methods are only run when the parent object tree node is opened. Note further that some of these methods may affect
+  the world.
 
 ## Dependencies:
 - Puzzle Loader
 - The latest Cosmic Reach version that has been verified to work with this mod is Alpha v0.5.8.
+- (Optional) [Dear ImGui Integration Mod](https://crmods.org/mod/imgui-integration)
 
 ### Build dependencies
 - Java >=24 for Cosmic Reach >=v0.4.17. The version must have a decimal (ex. 24.0.1), otherwise you will get 
@@ -75,7 +68,18 @@ an IllegalStateException (specifically:
 `throw new IllegalStateException("Unable to convert 'java.version' (" + jVersion + ") into a version number!");` from
 quiltmc). As an example, version 21.0.0 will fail to parse and throw an error.
 
-## How to Test Client & Server for Puzzle
-- For the Client you can use the `./gradlew :runClient` task (add `--warning-mode all` for more useful outputs)
-- For the Server  you can use the `./gradlew :runServer` task
+
+### Updating and Building from Source
+
+## Updating
+
+Run the `gradle cleanOldJigsawLocal` and `gradle cleanOldJigsawGlobal` tasks to remove outdated Jigsaw directories from the local
+and global environments.
+
+Run the `gradle transformJars` task to update the game jars.
+
+### Testing
+
+- Run `./gradlew runModdedClient --warning-mode all` to test the client;
+- Run `./gradlew runModdedServer --warning-mode all` to test the server.
 
