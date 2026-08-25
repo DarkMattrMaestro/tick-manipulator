@@ -22,7 +22,6 @@ public class EntitySelectionUtil {
             if ("base:entity_player".equals(e.entityTypeId)) { return; }
 
             float dist2 = e.position.dst2(playerPos);
-            Constants.LOGGER.warn("e type: {}", e.entityTypeId);
             if (closest.get() < 0 || dist2 < closest.get()) {
                 closest.set(dist2);
                 entity.set(e);

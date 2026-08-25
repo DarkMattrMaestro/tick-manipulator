@@ -3,7 +3,9 @@ package com.darkmattrmaestro.tick_manipulator.imguiStuff;
 import com.darkmattrmaestro.tick_manipulator.Constants;
 import com.darkmattrmaestro.tick_manipulator.Highlight.Highlight;
 import com.darkmattrmaestro.tick_manipulator.utils.BlockSelectionUtil;
+import com.darkmattrmaestro.tick_manipulator.utils.EntitySelectionUtil;
 import finalforeach.cosmicreach.blocks.BlockPosition;
+import finalforeach.cosmicreach.entities.GameEntity;
 import finalforeach.cosmicreach.gamestates.ChatMenu;
 import finalforeach.cosmicreach.gamestates.InGame;
 import finalforeach.cosmicreach.gamestates.PauseMenu;
@@ -24,8 +26,7 @@ public class DataWindow extends ImGuiWindow {
     private final ImBoolean SHOW_ERROR = new ImBoolean(false);
 
     private BlockPosition selectedBlockPos = null;
-
-    boolean simpleViewBlock = false;
+    private GameEntity selectedEntity = null;
 
     @Override
     public void init() {
@@ -51,8 +52,6 @@ public class DataWindow extends ImGuiWindow {
             for (Field field : clazz.getDeclaredFields()) {
                 if (targetPropertyNames != null && !targetPropertyNames.contains(field.getName().toLowerCase())) { continue; }
 
-                ImGui.text(field.getName() + " :");
-
                 Object resObj = null;
                 String res = null;
                 try {
@@ -63,24 +62,20 @@ public class DataWindow extends ImGuiWindow {
                 }
 
                 if (res == null) {
-                    ImGui.sameLine();
-                    ImGui.text("Field inaccessible.");
+                    ImGui.text(field.getName() + " : Field inaccessible.");
                 } else if (depth > 0 && res.contains("@")) {
                     if (ImGui.treeNodeEx(field.getName())) {
                         recursiveObjectTree((field.getType().cast(resObj)), null, depth - 1);
                         ImGui.treePop();
                     }
                 } else {
-                    ImGui.sameLine();
-                    ImGui.text(res);
+                    ImGui.text(field.getName() + " : " + res);
                 }
             }
 
             for (Method method : clazz.getDeclaredMethods()) {
                 if (targetPropertyNames != null && !targetPropertyNames.contains(method.getName().toLowerCase())) { continue; }
                 if (method.getParameterCount() != 0 || method.getReturnType().equals(Void.TYPE)) { continue; }
-
-                ImGui.text(method.getName() + " ->");
 
                 Object resObj = null;
                 String res = null;
@@ -91,16 +86,14 @@ public class DataWindow extends ImGuiWindow {
                 } catch (Exception _) { }
 
                 if (res == null) {
-                    ImGui.sameLine();
-                    ImGui.text("Method inaccessible.");
+                    ImGui.text(method.getName() + "() -> Method inaccessible.");
                 } else if (depth > 0 && res.contains("@")) {
-                    if (ImGui.treeNodeEx(method.getName())) {
+                    if (ImGui.treeNodeEx(method.getName() + "()")) {
                         recursiveObjectTree((method.getReturnType().cast(resObj)), null, depth - 1);
                         ImGui.treePop();
                     }
                 } else {
-                    ImGui.sameLine();
-                    ImGui.text(res);
+                    ImGui.text(method.getName() + "() -> " + res);
                 }
             }
 
@@ -121,7 +114,7 @@ public class DataWindow extends ImGuiWindow {
         // Block selection error modal
         if (ImGui.beginPopupModal("Error", SHOW_ERROR)) {
             ImGui.text("Error: No block is withing range!");
-            // Draw popup contents.
+
             ImGui.endPopup();
         }
 
@@ -131,7 +124,7 @@ public class DataWindow extends ImGuiWindow {
         } else {
             ImGui.beginChild("Scrolling");
 
-            if (ImGui.treeNodeEx("Data of " + this.selectedBlockPos + " :", ImGuiTreeNodeFlags.DefaultOpen)) {
+            if (ImGui.treeNodeEx("Data of block at " + this.selectedBlockPos + " :", ImGuiTreeNodeFlags.DefaultOpen)) {
                 recursiveObjectTree(this.selectedBlockPos, null, 3);
                 ImGui.treePop();
             }
@@ -141,9 +134,36 @@ public class DataWindow extends ImGuiWindow {
     }
 
     private void renderEntityTarget() {
-//        if (ImGui.checkbox("Simple View", simpleViewBlock)) {
-//            simpleViewBlock = !simpleViewBlock;
-//        }
+        // Update selected block position
+        if (ImGui.button("Select nearest entity")) {
+            this.selectedEntity = EntitySelectionUtil.getNearestEntityToPlayer();
+            if (this.selectedEntity == null) {
+                SHOW_ERROR.set(true);
+                ImGui.openPopup("Error");
+            }
+        }
+
+        // Block selection error modal
+        if (ImGui.beginPopupModal("Error", SHOW_ERROR)) {
+            ImGui.text("Error: No entity could be selected!");
+            ImGui.text("If an entity was previously selected, it may have despawned.");
+
+            ImGui.endPopup();
+        }
+
+        // Show tree of the block's data
+        if (this.selectedEntity == null) {
+            ImGui.text("No entity selected.");
+        } else {
+            ImGui.beginChild("Scrolling");
+
+            if (ImGui.treeNodeEx("Data of entity " + this.selectedEntity.entityTypeId + " at " + this.selectedEntity.position + " :", ImGuiTreeNodeFlags.DefaultOpen)) {
+                recursiveObjectTree(this.selectedEntity, null, 3);
+                ImGui.treePop();
+            }
+
+            ImGui.endChild();
+        }
     }
 
     @Override
