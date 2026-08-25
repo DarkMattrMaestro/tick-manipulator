@@ -1,5 +1,7 @@
 .gradle/
 run/
+runs/
+libs/
 
 build/
 old_builds/
