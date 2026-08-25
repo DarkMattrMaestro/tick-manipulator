@@ -1,6 +1,3 @@
-> [!NOTE]
-> Updated to Cosmic Reach Alpha v0.5.16
-
 # Tick Manipulator
 This mod adds commands and keybinds that make analysing Cosmic Reach tick-by-tick easier.
 
