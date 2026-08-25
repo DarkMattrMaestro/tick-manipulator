@@ -17,10 +17,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashSet;
-import java.util.Objects;
 
 public class DataWindow extends ImGuiWindow {
     private final ImBoolean SHOW = new ImBoolean(true);
+
+    private final ImBoolean SHOW_ERROR = new ImBoolean(false);
+
+    private BlockPosition selectedBlockPos = null;
 
     boolean simpleViewBlock = false;
 
@@ -32,7 +35,15 @@ public class DataWindow extends ImGuiWindow {
     }
 
 
-
+    /**
+     * Recursively renders a tree of all properties in the given object.
+     *
+     * @param obj The object to search.
+     * @param targetPropertyNames Names of properties to selectively show. If null, shows all properties. If not null,
+     *                            shows only properties listed in `targetPropertyNames`.
+     * @param depth The maximal depth to search.
+     * @param <T> The object type to search.
+     */
     public <T> void recursiveObjectTree(T obj, HashSet<String> targetPropertyNames, int depth) {
         Class clazz = obj.getClass();
         while (clazz != Object.class) {
@@ -40,59 +51,92 @@ public class DataWindow extends ImGuiWindow {
             for (Field field : clazz.getDeclaredFields()) {
                 if (targetPropertyNames != null && !targetPropertyNames.contains(field.getName().toLowerCase())) { continue; }
 
+                ImGui.text(field.getName() + " :");
+
                 Object resObj = null;
                 String res = null;
                 try {
                     field.setAccessible(true);
                     resObj = field.get(obj);
                     res = String.valueOf(field.get(obj));
-                } catch (IllegalAccessException _) {
+                } catch (Exception _) {
                 }
+
                 if (res == null) {
+                    ImGui.sameLine();
                     ImGui.text("Field inaccessible.");
                 } else if (depth > 0 && res.contains("@")) {
-                    ImGui.treeNodeEx(field.getName());
-                    recursiveObjectTree((field.getClass().cast(resObj)), null, depth - 1);
-                    ImGui.treePop();
+                    if (ImGui.treeNodeEx(field.getName())) {
+                        recursiveObjectTree((field.getType().cast(resObj)), null, depth - 1);
+                        ImGui.treePop();
+                    }
                 } else {
+                    ImGui.sameLine();
                     ImGui.text(res);
                 }
             }
-//            for (Method method : clazz.getDeclaredMethods()) {
-//                if (targetPropertyNames != null && !targetPropertyNames.contains(method.getName().toLowerCase())) { continue; }
-//                if (method.getParameterCount() != 0 || method.getReturnType().equals(Void.TYPE)) { continue; }
-//
-//                String res = null;
-//                try {
-//                    method.setAccessible(true);
-//                    res = String.valueOf(method.invoke(obj));
-//                } catch (IllegalAccessException | InvocationTargetException _) { }
-//                appendObjProp(msg, res, method.getName(), "->", subIndentLevel, "method");
-//            }
+
+            for (Method method : clazz.getDeclaredMethods()) {
+                if (targetPropertyNames != null && !targetPropertyNames.contains(method.getName().toLowerCase())) { continue; }
+                if (method.getParameterCount() != 0 || method.getReturnType().equals(Void.TYPE)) { continue; }
+
+                ImGui.text(method.getName() + " ->");
+
+                Object resObj = null;
+                String res = null;
+                try {
+                    method.setAccessible(true);
+                    resObj = method.invoke(obj);
+                    res = String.valueOf(resObj);
+                } catch (Exception _) { }
+
+                if (res == null) {
+                    ImGui.sameLine();
+                    ImGui.text("Method inaccessible.");
+                } else if (depth > 0 && res.contains("@")) {
+                    if (ImGui.treeNodeEx(method.getName())) {
+                        recursiveObjectTree((method.getReturnType().cast(resObj)), null, depth - 1);
+                        ImGui.treePop();
+                    }
+                } else {
+                    ImGui.sameLine();
+                    ImGui.text(res);
+                }
+            }
 
             clazz = clazz.getSuperclass();
         }
     }
 
     private void renderBlocksTarget() {
-        if (ImGui.checkbox("Simple View", simpleViewBlock)) {
-            simpleViewBlock = !simpleViewBlock;
+        // Update selected block position
+        if (ImGui.button("Select block at cursor")) {
+            this.selectedBlockPos = BlockSelectionUtil.getBlockLookingAtFar(100);
+            if (this.selectedBlockPos == null) {
+                SHOW_ERROR.set(true);
+                ImGui.openPopup("Error");
+            }
         }
 
-        if (ImGui.button("Update")) {
-            BlockPosition blockPos = BlockSelectionUtil.getBlockLookingAtFar(100);
+        // Block selection error modal
+        if (ImGui.beginPopupModal("Error", SHOW_ERROR)) {
+            ImGui.text("Error: No block is withing range!");
+            // Draw popup contents.
+            ImGui.endPopup();
+        }
 
-            if (blockPos == null) {
-                ImGui.text("No block found!");
-            } else {
-                ImGui.beginChild("Scrolling");
-                ImGui.treeNodeEx("Data of " + blockPos + " :", ImGuiTreeNodeFlags.DefaultOpen);
+        // Show tree of the block's data
+        if (this.selectedBlockPos == null) {
+            ImGui.text("No block selected.");
+        } else {
+            ImGui.beginChild("Scrolling");
 
-                recursiveObjectTree(blockPos, null, 3);
-
+            if (ImGui.treeNodeEx("Data of " + this.selectedBlockPos + " :", ImGuiTreeNodeFlags.DefaultOpen)) {
+                recursiveObjectTree(this.selectedBlockPos, null, 3);
                 ImGui.treePop();
-                ImGui.endChild();
             }
+
+            ImGui.endChild();
         }
     }
 
