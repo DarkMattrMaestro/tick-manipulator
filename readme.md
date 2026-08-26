@@ -1,6 +1,10 @@
 # Tick Manipulator
 This mod adds commands and keybinds that make analysing Cosmic Reach tick-by-tick easier.
 
+## Guide
+
+There's a video guide for Tick Manipulator 0.6.1-0.2.0 available on Youtube: https://www.youtube.com/watch?v=HW7DXemh7zw
+
 ## Keybind Information
 Stepping:
 - `<Page Up>` to go to step forward one tick when ticking is frozen.
