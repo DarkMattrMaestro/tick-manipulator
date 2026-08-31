@@ -3,8 +3,11 @@ package com.darkmattrmaestro.tick_manipulator.mixins;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
+import com.darkmattrmaestro.tick_manipulator.Constants;
 import com.darkmattrmaestro.tick_manipulator.PerWorldSingletons;
 import com.darkmattrmaestro.tick_manipulator.interfaces.IMixinZone;
+import com.darkmattrmaestro.tick_manipulator.packets.SkyPacket;
+import finalforeach.cosmicreach.singletons.GameSingletons;
 import finalforeach.cosmicreach.world.RandomTicks;
 import finalforeach.cosmicreach.blocks.blockentities.BlockEntity;
 import finalforeach.cosmicreach.gameevents.blockevents.ScheduledBlockTrigger;
@@ -199,8 +202,22 @@ public class ZoneMixin implements Json.Serializable, Disposable, IMixinZone {
     }
 
     @Unique
-    public boolean setIsSkyFrozen() {
+    public boolean getIsSkyFrozen() {
         return this.isSkyFrozen;
+    }
+
+    @Override
+    public void setFrozenSkyTime(float time) {
+        this.savedSkyTimeSeconds = time;
+    }
+
+    @Override
+    public float getFrozenSkyTime() {
+        if (!isSkyFrozen) {
+            this.savedSkyTimeSeconds = (float)this.getCurrentWorldTick() * 0.05F;
+        }
+
+        return this.savedSkyTimeSeconds;
     }
 
     @Shadow
@@ -215,6 +232,18 @@ public class ZoneMixin implements Json.Serializable, Disposable, IMixinZone {
         } else {
             this.savedSkyTimeSeconds = (float)this.getCurrentWorldTick() * 0.05F;
             cir.setReturnValue(this.savedSkyTimeSeconds);
+        }
+    }
+
+    @Inject(
+            method = "addPlayer",
+            at = @At(value = "TAIL")
+    )
+    public void addPlayer(Player player, CallbackInfo ci) {
+        if (GameSingletons.isClient() && !GameSingletons.isHost()) {
+            if (player != null && player.equals(GameSingletons.client().getLocalPlayer())) {
+                GameSingletons.clientSingletons.sendAsClient(SkyPacket.generateRequestPacket((Zone) (Object) this));
+            }
         }
     }
 }

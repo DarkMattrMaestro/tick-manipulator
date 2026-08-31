@@ -70,6 +70,16 @@ java {
     }
 }
 
+afterEvaluate {
+    tasks.named("runModdedClient") {
+        environment "ITCHIO_API_KEY", itch_api_key
+    }
+
+    tasks.named("runVanillaClient") {
+        environment "ITCHIO_API_KEY", itch_api_key
+    }
+}
+
 
 
 
