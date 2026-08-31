@@ -1,5 +1,6 @@
 # Tick Manipulator
-This mod adds commands and keybinds that make analysing Cosmic Reach tick-by-tick easier.
+This mod adds commands and keybinds that make analysing Cosmic Reach tick-by-tick easier. Control the ticking system,
+read block and entity data, set the sky's time, and more!
 
 ## Guide
 
@@ -17,10 +18,7 @@ Resetting:
 - `/tick reset` to reset all ticking modifiers to the vanilla default (unfrozen, no delay).
 
 Freezing:
-- `/tick freeze` to freeze the game's ticking.
-- `/tick unfreeze` to unfreeze the game's ticking.
-- `/time freeze` to freeze the sky.
-- `/time unfreeze` to unfreeze the sky.
+- `/tick {freeze|unfreeze}` to freeze and unfreeze the game's ticking system.
 
 Stepping:
 - `/tick step` to step to the next tick.
@@ -53,9 +51,14 @@ Data Querying:
   methods are only run when the parent object tree node is opened. Note further that some of these methods may affect
   the world.
 
+Sky Time Control:
+- `/skytime {freeze|unfreeze}` to freeze and unfreeze the passage of time in the sky. Useful for keeping daylight.
+  The frozen state resets on world or server reloads.
+- `/skytime set {time in ticks}` to set the sky's time. This is only used when the sky time is frozen and resets when it
+  is unfrozen.
+
 ## Dependencies:
 - Puzzle Loader
-- The latest Cosmic Reach version that has been verified to work with this mod is Alpha v0.5.8.
 - (Optional) [Dear ImGui Integration Mod](https://crmods.org/mod/imgui-integration)
 
 ### Build dependencies
