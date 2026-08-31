@@ -13,6 +13,7 @@ public interface IMixinZone {
     void setTickDelay(int delay);
 
     void setIsSkyFrozen(boolean isSkyFrozen);
-
-    boolean setIsSkyFrozen();
+    boolean getIsSkyFrozen();
+    void setFrozenSkyTime(float time);
+    float getFrozenSkyTime();
 }

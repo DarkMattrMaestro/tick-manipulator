@@ -5,7 +5,7 @@
   "compatibilityLevel": "JAVA_24",
   "mixins": [
     "ZoneMixin",
-    "CommandTimeMixin"
+    "ZonePacketMixin"
   ],
   "injectors": {
     "defaultRequire": 1
