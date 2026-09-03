@@ -8,6 +8,9 @@ public interface IMixinTickRunner {
     boolean getFrozen();
     void setFrozen(boolean frozen);
 
+    boolean isSprinting();
+    void setSprint(long ticks);
+
     void setTickRate(float tickRate);
 
     float getCustomTickRate();

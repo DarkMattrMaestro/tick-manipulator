@@ -85,6 +85,7 @@ public class CommandTick extends Command {
         ((IMixinTickRunner) TickRunner.INSTANCE).setTicksRemaining(0);
         ((IMixinTickRunner) TickRunner.INSTANCE).setFrozen(false);
         ((IMixinTickRunner) TickRunner.INSTANCE).setTickRate(IMixinTickRunner.DEFAULT_TICK_RATE);
+        PerWorldSingletons.repeatCalls.clear();
         sendMsg("Ticking reset");
     }
 
@@ -139,19 +140,19 @@ public class CommandTick extends Command {
 
     public static void sprint(IChat chat, String arg1) {
         if (arg1.toLowerCase().startsWith("cancel")) {
-            ((IMixinTickRunner) TickRunner.INSTANCE).setTickRate(IMixinTickRunner.DEFAULT_TICK_RATE);
+            ((IMixinTickRunner) TickRunner.INSTANCE).setSprint(0);
             sendMsg("Reset tick rate to " + IMixinTickRunner.DEFAULT_TICK_RATE + " ticks per second.");
             return;
         }
 
         try {
-            float rate = Float.parseFloat(arg1);
-            if (rate <= 0) {
-                sendMsg("The tick rate must be a positive non-zero floating-point number!");
+            long ticks = Long.parseLong(arg1);
+            if (ticks <= 0) {
+                sendMsg("The number of ticks to sprint must be a positive, non-zero, whole number!");
                 return;
             }
-            ((IMixinTickRunner) TickRunner.INSTANCE).setTickRate(rate);
-            sendMsg("Set tick rate to " + rate + " ticks per second.");
+            ((IMixinTickRunner) TickRunner.INSTANCE).setSprint(ticks);
+            sendMsg("Sprinting " + ticks + " ticks.");
         } catch (NumberFormatException e) {
             sendMsg("The command must be of the form `/tick sprint {ticks per second}` or `/tick sprint cancel`");
         }
@@ -203,7 +204,7 @@ public class CommandTick extends Command {
                 if (this.hasNextArg()) {
                     rate(chat, this.getNextArg());
                 } else {
-                    sendMsg("The command must be of the form `/tick rate {number of ticks}`");
+                    sendMsg("The current tick rate is " + ((IMixinTickRunner) TickRunner.INSTANCE).getCustomTickRate() + " ticks per second.");
                 }
                 break;
             }
@@ -211,7 +212,7 @@ public class CommandTick extends Command {
                 if (this.hasNextArg()) {
                     sprint(chat, this.getNextArg());
                 } else {
-                    sendMsg("The current tick rate is " + ((IMixinTickRunner) TickRunner.INSTANCE).getCustomTickRate() + " ticks per second.");
+                    sendMsg("The command must be of the form `/tick sprint {ticks per second}` or `/tick sprint cancel`");
                 }
                 break;
             }
