@@ -85,6 +85,7 @@ public class CommandTick extends Command {
         ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$setTicksRemaining(0);
         ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$setFrozen(false);
         ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$setTickRate(IMixinTickRunner.DEFAULT_TICK_RATE);
+        ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$cancelSprint();
         PerWorldSingletons.repeatCalls.clear();
         sendMsg("Ticking reset");
     }
@@ -140,7 +141,7 @@ public class CommandTick extends Command {
 
     public static void sprint(IChat chat, String arg1) {
         if (arg1.toLowerCase().startsWith("cancel")) {
-            ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$setSprint(0);
+            ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$cancelSprint();
             sendMsg("Reset tick rate to " + IMixinTickRunner.DEFAULT_TICK_RATE + " ticks per second.");
             return;
         }

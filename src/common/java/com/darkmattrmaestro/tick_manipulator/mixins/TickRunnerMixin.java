@@ -29,8 +29,13 @@ public class TickRunnerMixin implements IMixinTickRunner {
     @Override public boolean tickManipulator$getFrozen() { return this.tickManipulator$frozen; }
     @Override public void tickManipulator$setFrozen(boolean frozen) { this.tickManipulator$frozen = frozen; }
 
+    /** A check for whether the ticking system frozen before starting sprint or not. */
+    @Unique private boolean tickManipulator$sprintWasFrozen = false;
+    /** Number of ticks to sprint. */
     @Unique private long tickManipulator$sprintTicks = 0;
+    /** The time in nanoseconds when the sprint started. */
     @Unique private long tickManipulator$sprintStartTime = 0;
+    /** The tick at which to stop sprinting */
     @Unique private long tickManipulator$sprintEndTick = 0;
     @Override public boolean tickManipulator$isSprinting() {
         return this.tickManipulator$sprintEndTick > GameSingletons.world.currentWorldTick && tickManipulator$sprintStartTime != 0;
@@ -41,6 +46,16 @@ public class TickRunnerMixin implements IMixinTickRunner {
         this.tickManipulator$sprintStartTime = System.nanoTime();
         this.tickManipulator$sprintTicks = ticks;
         this.tickManipulator$setTickRate(Float.MAX_VALUE);
+        this.tickManipulator$sprintWasFrozen = this.tickManipulator$getFrozen();
+        this.tickManipulator$setFrozen(false);
+    }
+    @Override
+    public void tickManipulator$cancelSprint() {
+        this.tickManipulator$setTickRate(IMixinTickRunner.DEFAULT_TICK_RATE);
+        this.tickManipulator$sprintStartTime = 0;
+        this.fixedUpdateAccumulator = -1;
+        this.tickManipulator$setFrozen(this.tickManipulator$sprintWasFrozen);
+        this.tickManipulator$sprintWasFrozen = false;
     }
     @Unique
     public void tickManipulator$updateSprinting() {
@@ -61,9 +76,7 @@ public class TickRunnerMixin implements IMixinTickRunner {
             deltaTimeHours %= 24;
 
             sendMsg("Finished sprinting " + this.tickManipulator$sprintTicks + " ticks in " + deltaTimeDays + "d" + deltaTimeHours + "h" + deltaTimeMinutes + "min" + deltaTimeSeconds + "." + deltaTimeMilli + "s");
-            this.tickManipulator$setTickRate(IMixinTickRunner.DEFAULT_TICK_RATE);
-            this.tickManipulator$sprintStartTime = 0;
-            this.fixedUpdateAccumulator = -1;
+            this.tickManipulator$cancelSprint();
         }
     }
 

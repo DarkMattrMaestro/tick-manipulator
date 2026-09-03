@@ -9,12 +9,11 @@ public interface IMixinTickRunner {
     void tickManipulator$setFrozen(boolean frozen);
 
     boolean tickManipulator$isSprinting();
+    void tickManipulator$cancelSprint();
     void tickManipulator$setSprint(long ticks);
 
     void tickManipulator$setTickRate(float tickRate);
-
     float tickManipulator$getCustomTickRate();
-
     float tickManipulator$getCustomUpdateTimestep();
 
     float DEFAULT_TICK_RATE = 20.0F;
