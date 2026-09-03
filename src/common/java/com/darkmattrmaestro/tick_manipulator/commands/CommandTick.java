@@ -12,41 +12,34 @@ import static com.darkmattrmaestro.tick_manipulator.utils.ChatUtils.sendMsg;
 
 public class CommandTick extends Command {
     private static final String HELP_MSG = """
-            
-            Tick Manipulation Help:
-            All commands take the general form '/tick {action} {arg1} {arg2} {...}'.
-            
-            Help
-            - '/tick help' to get this help command.
-            
-            GUI
-            - '/tick gui' to display the encompassing GUI for the Tick Manipulator mod.
+            Help:
+            - `/tick help` to get this help information.
             
             Resetting:
-            - '/tick reset' to reset all ticking modifiers to the vanilla default (unfrozen, no delay).
+            - `/tick reset` to reset all ticking modifiers to the vanilla default.
             
-            Freezing:
-            - '/tick freeze' to freeze the game's ticking.
-            - '/tick unfreeze' to unfreeze the game's ticking.
+            Freezing Ticks:
+            - `/tick {freeze|unfreeze}` to freeze and unfreeze the game's ticking system.
             
-            Stepping:
-            - '/tick step' to step to the next tick.
-            - '/tick step {number of ticks}' to step the given number of ticks. Ticks are evaluated as usual
-                then paused once the given number of ticks are processed. Eg. '/tick step 5' ticks the game
-                five times.
+            Stepping Ticks:
+            - `/tick step` to step to the next tick.
+            - `/tick step {number of ticks}` to step the given number of ticks. Ticks are evaluated as usual,
+              then paused once the given number of ticks are processed. E.g. `/tick step 5` ticks the game
+              five times.
             
-            Delaying:
-            - '/tick delay {delay in milliseconds}' to wait the given number of milliseconds before each tick.
-                Eg. '/tick delay 1000' waits one second before each tick.
+            Setting Tick Rate:
+            - `/tick rate {ticks per second}` to set the tick rate. The player is not affected by the modified tick rate.
+            - `/tick rate reset` to set the tick rate back to the game's default.
             
-            Repeating:
-            - '/tick repeat add {command}' adds the given command (without a slash) to the list of commands to
-                run every tick. E.g. '/tick repeat add data entity velocity'.
-            - '/tick repeat clear' clears the list of commands to run every tick.
+            Sprinting Ticks:
+            - `/tick sprint {number of ticks}` to speed through the given number of ticks as quickly as possible.
+              Tick sprinting acts as an expedited version of the tick step command when the ticking system is frozen, which is
+              useful when skipping ahead a few hundred ticks without waiting long.
             
-            Notes:
-            - Stepping and Delaying are mutually exclusive. Stepping can only be used when ticking is frozen,
-                while delaying requires ticking to be unfrozen.
+            Repeating Commands:
+            - `/tick repeat add {command}` to add a command to the list of commands run every tick.
+              E.g. `/tick repeat add data simple entity velocity` logs the nearest entity's velocity every tick.
+            - `/tick repeat clear` to clear the list of commands run every tick.
             """;
     /* TODO
             State Loading:
@@ -56,6 +49,7 @@ public class CommandTick extends Command {
 
     public static void help(IChat chat) {
         sendMsg(HELP_MSG);
+        Constants.LOGGER.info(HELP_MSG);
     }
 
     public void repeat(IChat chat) {
@@ -221,7 +215,9 @@ public class CommandTick extends Command {
                 Constants.clientTickGUISpawner.run();
             }
             default: {
-                sendMsg("Unrecognized tick action! Type `/tick help` for a list of valid commands.");
+                sendMsg("""
+                    Unrecognized tick action! Type `/tick help` for a list of valid commands,
+                    or see https://github.com/DarkMattrMaestro/tick-manipulator for more info.""");
                 break;
             }
         }
