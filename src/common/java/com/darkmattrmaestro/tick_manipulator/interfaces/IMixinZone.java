@@ -5,15 +5,6 @@ import org.spongepowered.asm.mixin.Unique;
 public interface IMixinZone {
     void updatePlayerEntities(float deltaTime);
 
-    boolean getFrozen();
-    void setFrozen(boolean state);
-
-    int getAdvanceTicks();
-    void setAdvanceTicks(int ticks);
-
-    int getTickDelay();
-    void setTickDelay(int delay);
-
     void setIsSkyFrozen(boolean isSkyFrozen);
     boolean getIsSkyFrozen();
     void setFrozenSkyTime(float time);

@@ -34,64 +34,8 @@ import static java.lang.Integer.max;
 
 @Mixin(Zone.class)
 public class ZoneMixin implements Json.Serializable, Disposable, IMixinZone {
-
-    @Unique
-    private static final int msPerTick = 1000 / 20;
-
-    @Unique
-    boolean frozen = false;
-    @Override
-    public boolean getFrozen() {
-        return this.frozen;
-    }
-
-    @Override
-    public void setFrozen(boolean state) {
-        this.frozen = state;
-    }
-
-    @Unique
-    int advanceTicks = 0;
-    @Override
-    public int getAdvanceTicks() {
-        return this.advanceTicks;
-    }
-
-    @Override
-    public void setAdvanceTicks(int ticks) {
-        this.advanceTicks = max(ticks, 0);
-    }
-
-    @Unique
-    int tickDelay = 0;
-    @Override
-    public int getTickDelay() {
-        return this.tickDelay;
-    }
-
-    @Override
-    public void setTickDelay(int delay) {
-        this.tickDelay = max(delay, 0);
-    }
-
-    @Shadow public PriorityQueue<ScheduledBlockTrigger> eventQueue;
-    @Shadow public SnapshotArray<BlockEntity> tickingBlockEntities;
-    @Shadow public Array<IRenderable> allRenderableBlockEntities;
-    @Shadow public int currentZoneTick;
-    @Shadow private transient Region[] regionValues;
     @Shadow private Array<Player> players;
-    @Shadow public Vector3 spawnPoint;
-    @Shadow public String zoneId;
-    @Shadow public ZoneGenerator zoneGenerator;
-    @Shadow public float respawnHeight;
-    @Shadow private String skyId;
     @Shadow private transient World world;
-    @Shadow private transient MobSpawner hostileMobSpawner;
-    @Shadow private transient MobSpawner neutralMobSpawner;
-    @Shadow private RandomTicks randomTicks;
-
-    @Shadow
-    public void runScheduledTriggers() {}
 
     @Shadow
     public void despawnEntity(GameEntity entity) {}
@@ -139,47 +83,6 @@ public class ZoneMixin implements Json.Serializable, Disposable, IMixinZone {
                 }
             }
         });
-    }
-
-    @Inject(
-            method = "update",
-            cancellable = true,
-            at = @At("HEAD")
-    )
-    public void update(float deltaTime, CallbackInfo ci) {
-        // If not frozen, use the original update function, and reset freeze stepping vars
-        if (!frozen) {
-            if (this.tickDelay > 0) {
-                try {
-                    for (int i = 0; i <= this.tickDelay / msPerTick; i++) {
-                        this.updatePlayerEntities((float) msPerTick / 1000);
-                        TimeUnit.MILLISECONDS.sleep(msPerTick);
-                    }
-                    if (this.tickDelay % msPerTick > 0) {
-                        this.updatePlayerEntities((float) (this.tickDelay % msPerTick) / 1000);
-                        TimeUnit.MILLISECONDS.sleep(this.tickDelay % msPerTick);
-                    }
-                } catch (Exception _) {}
-            }
-
-            this.setAdvanceTicks(0);
-
-            PerWorldSingletons.repeatCalls.forEach((repeatCall) -> {
-                repeatCall.accept(null);
-            });
-        } else {
-            if (this.getAdvanceTicks() < 1) { // Frozen
-                this.updatePlayerEntities(deltaTime);
-
-                this.setAdvanceTicks(this.getAdvanceTicks() - 1);
-                ci.cancel();
-                return;
-            }
-
-            // Step normally
-            sendMsg("Remaining ticks: " + this.getAdvanceTicks());
-            this.setAdvanceTicks(this.getAdvanceTicks() - 1);
-        }
     }
 
     @Shadow
