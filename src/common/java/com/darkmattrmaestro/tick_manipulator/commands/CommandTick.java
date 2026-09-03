@@ -118,17 +118,17 @@ public class CommandTick extends Command {
         }
     }
 
-    public static void delay(IChat chat, String arg1) {
+    public static void rate(IChat chat, String arg1) {
         try {
-            int delay = Integer.parseInt(arg1);
-            if (delay <= 0) {
-                sendMsg("The delay must be a positive non-zero integer!");
+            float rate = Float.parseFloat(arg1);
+            if (rate <= 0) {
+                sendMsg("The tick rate must be a positive non-zero floating-point number!");
                 return;
             }
-            ZoneTickingUtils.setDelay(delay);
-            sendMsg("Set delay to " + delay + " ms");
+            PerWorldSingletons.setTickRate(rate);
+            sendMsg("Set tick rate to " + rate + " ticks per second.");
         } catch (NumberFormatException e) {
-            sendMsg("The command must be of the form /tick delay {delay in milliseconds}");
+            sendMsg("The command must be of the form /tick rate {ticks per second}");
         }
     }
 
@@ -174,11 +174,11 @@ public class CommandTick extends Command {
                 }
                 break;
             }
-            case "delay": {
+            case "rate": {
                 if (this.hasNextArg()) {
-                    delay(chat, this.getNextArg());
+                    rate(chat, this.getNextArg());
                 } else {
-                    sendMsg("The command must be of the form /tick delay {delay in milliseconds}");
+                    sendMsg("The current tick rate is " + PerWorldSingletons.getCustomTickRate() + " ticks per second.");
                 }
                 break;
             }
@@ -188,12 +188,6 @@ public class CommandTick extends Command {
                 }
 
                 Constants.clientTickGUISpawner.run();
-
-//                Constants.LOGGER.warn(GameSingletons.client());
-//
-//                GameSingletons.client().sendAsClient(new TickGUIPacket());
-
-//                (new TickGUIPacket()).setupAndSend(ServerSingletons.getConnection(this.getCallingPlayer()));
             }
             default: {
                 sendMsg("Unrecognized tick action! Type `/tick help` for a list of valid commands.");

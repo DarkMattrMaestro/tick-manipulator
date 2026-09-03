@@ -99,7 +99,7 @@ public class ZoneMixin implements Json.Serializable, Disposable, IMixinZone {
     @Shadow
     public Array<GameEntity> getAllEntities() { return null; }
 
-    @Unique void updatePlayerEntities(float deltaTime) {
+    @Unique public void updatePlayerEntities(float deltaTime) {
         ArrayUtils.forEach(this.getAllEntities().toArray(GameEntity.class), (GameEntity e) -> {
             if (!"base:entity_player".equals(e.entityTypeId)) {
                 return;
@@ -163,6 +163,10 @@ public class ZoneMixin implements Json.Serializable, Disposable, IMixinZone {
             }
 
             this.setAdvanceTicks(0);
+
+            PerWorldSingletons.repeatCalls.forEach((repeatCall) -> {
+                repeatCall.accept(null);
+            });
         } else {
             if (this.getAdvanceTicks() < 1) { // Frozen
                 this.updatePlayerEntities(deltaTime);
@@ -176,10 +180,6 @@ public class ZoneMixin implements Json.Serializable, Disposable, IMixinZone {
             sendMsg("Remaining ticks: " + this.getAdvanceTicks());
             this.setAdvanceTicks(this.getAdvanceTicks() - 1);
         }
-
-        PerWorldSingletons.repeatCalls.forEach((repeatCall) -> {
-            repeatCall.accept(null);
-        });
     }
 
     @Shadow
