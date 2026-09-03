@@ -1,5 +1,7 @@
 package com.darkmattrmaestro.tick_manipulator;
 
+import org.spongepowered.asm.mixin.Shadow;
+
 import java.util.ArrayList;
 import java.util.function.Consumer;
 

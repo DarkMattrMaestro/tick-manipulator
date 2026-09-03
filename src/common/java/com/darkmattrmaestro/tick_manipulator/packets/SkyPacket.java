@@ -29,9 +29,9 @@ public class SkyPacket extends GamePacket {
     }
 
     public SkyPacket(Zone zone) {
-        this.frozen = ((IMixinZone) zone).getIsSkyFrozen();
+        this.frozen = ((IMixinZone) zone).tickManipulator$getIsSkyFrozen();
         this.zone = zone;
-        this.time = ((IMixinZone) zone).getFrozenSkyTime();
+        this.time = ((IMixinZone) zone).tickManipulator$getFrozenSkyTime();
     }
 
     public SkyPacket(float time, boolean frozen, Zone zone) {
@@ -69,13 +69,13 @@ public class SkyPacket extends GamePacket {
 
     public void handle(NetworkIdentity identity, ChannelHandlerContext ctx) {
         if (!identity.isServer()) {
-            ((IMixinZone) this.zone).setIsSkyFrozen(this.frozen);
-            ((IMixinZone) this.zone).setFrozenSkyTime(this.time);
+            ((IMixinZone) this.zone).tickManipulator$setIsSkyFrozen(this.frozen);
+            ((IMixinZone) this.zone).tickManipulator$setFrozenSkyTime(this.time);
         } else if (this.requesting) {
             if (GameSingletons.isHost() && ServerSingletons.SERVER != null) {
                 SkyPacket skyPacket = new SkyPacket(
-                        ((IMixinZone) zone).getFrozenSkyTime(),
-                        ((IMixinZone) zone).getIsSkyFrozen(),
+                        ((IMixinZone) zone).tickManipulator$getFrozenSkyTime(),
+                        ((IMixinZone) zone).tickManipulator$getIsSkyFrozen(),
                         zone
                 );
 

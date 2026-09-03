@@ -2,54 +2,44 @@ package com.darkmattrmaestro.tick_manipulator.commands;
 
 import com.darkmattrmaestro.tick_manipulator.Constants;
 import com.darkmattrmaestro.tick_manipulator.PerWorldSingletons;
-import com.darkmattrmaestro.tick_manipulator.utils.ZoneTickingUtils;
+import com.darkmattrmaestro.tick_manipulator.interfaces.IMixinTickRunner;
+import finalforeach.cosmicreach.TickRunner;
 import finalforeach.cosmicreach.chat.IChat;
 import finalforeach.cosmicreach.chat.commands.Command;
-import finalforeach.cosmicreach.networking.NetworkIdentity;
-import finalforeach.cosmicreach.networking.server.ServerBroadcastIdentity;
-import finalforeach.cosmicreach.networking.server.ServerNetworkManager;
-import finalforeach.cosmicreach.networking.server.ServerSingletons;
 import finalforeach.cosmicreach.singletons.GameSingletons;
 
 import static com.darkmattrmaestro.tick_manipulator.utils.ChatUtils.sendMsg;
 
 public class CommandTick extends Command {
     private static final String HELP_MSG = """
-            
-            Tick Manipulation Help:
-            All commands take the general form '/tick {action} {arg1} {arg2} {...}'.
-            
-            Help
-            - '/tick help' to get this help command.
-            
-            GUI
-            - '/tick gui' to display the encompassing GUI for the Tick Manipulator mod.
+            Help:
+            - `/tick help` to get this help information.
             
             Resetting:
-            - '/tick reset' to reset all ticking modifiers to the vanilla default (unfrozen, no delay).
+            - `/tick reset` to reset all ticking modifiers to the vanilla default.
             
-            Freezing:
-            - '/tick freeze' to freeze the game's ticking.
-            - '/tick unfreeze' to unfreeze the game's ticking.
+            Freezing Ticks:
+            - `/tick {freeze|unfreeze}` to freeze and unfreeze the game's ticking system.
             
-            Stepping:
-            - '/tick step' to step to the next tick.
-            - '/tick step {number of ticks}' to step the given number of ticks. Ticks are evaluated as usual
-                then paused once the given number of ticks are processed. Eg. '/tick step 5' ticks the game
-                five times.
+            Stepping Ticks:
+            - `/tick step` to step to the next tick.
+            - `/tick step {number of ticks}` to step the given number of ticks. Ticks are evaluated as usual,
+              then paused once the given number of ticks are processed. E.g. `/tick step 5` ticks the game
+              five times.
             
-            Delaying:
-            - '/tick delay {delay in milliseconds}' to wait the given number of milliseconds before each tick.
-                Eg. '/tick delay 1000' waits one second before each tick.
+            Setting Tick Rate:
+            - `/tick rate {ticks per second}` to set the tick rate. The player is not affected by the modified tick rate.
+            - `/tick rate reset` to set the tick rate back to the game's default.
             
-            Repeating:
-            - '/tick repeat add {command}' adds the given command (without a slash) to the list of commands to
-                run every tick. E.g. '/tick repeat add data entity velocity'.
-            - '/tick repeat clear' clears the list of commands to run every tick.
+            Sprinting Ticks:
+            - `/tick sprint {number of ticks}` to speed through the given number of ticks as quickly as possible.
+              Tick sprinting acts as an expedited version of the tick step command when the ticking system is frozen, which is
+              useful when skipping ahead a few hundred ticks without waiting long.
             
-            Notes:
-            - Stepping and Delaying are mutually exclusive. Stepping can only be used when ticking is frozen,
-                while delaying requires ticking to be unfrozen.
+            Repeating Commands:
+            - `/tick repeat add {command}` to add a command to the list of commands run every tick.
+              E.g. `/tick repeat add data simple entity velocity` logs the nearest entity's velocity every tick.
+            - `/tick repeat clear` to clear the list of commands run every tick.
             """;
     /* TODO
             State Loading:
@@ -59,6 +49,7 @@ public class CommandTick extends Command {
 
     public static void help(IChat chat) {
         sendMsg(HELP_MSG);
+        Constants.LOGGER.info(HELP_MSG);
     }
 
     public void repeat(IChat chat) {
@@ -85,22 +76,26 @@ public class CommandTick extends Command {
     }
 
     public static void reset(IChat chat) {
-        ZoneTickingUtils.resetTicking();
+        ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$setTicksRemaining(0);
+        ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$setFrozen(false);
+        ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$setTickRate(IMixinTickRunner.DEFAULT_TICK_RATE);
+        ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$cancelSprint();
+        PerWorldSingletons.repeatCalls.clear();
         sendMsg("Ticking reset");
     }
 
     public static void freeze(IChat chat) {
-        ZoneTickingUtils.setFreezeState(true);
+        ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$setFrozen(true);
         sendMsg("Frozen");
     }
 
     public static void unfreeze(IChat chat) {
-        ZoneTickingUtils.setFreezeState(false);
+        ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$setFrozen(false);
         sendMsg("Unfrozen");
     }
 
     public static void step(IChat chat) {
-        ZoneTickingUtils.stepTicks(1);
+        ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$setTicksRemaining(1);
         sendMsg("Stepped 1 tick");
     }
 
@@ -111,29 +106,51 @@ public class CommandTick extends Command {
                 sendMsg("Steps must be positive (and non-zero)!");
                 return;
             }
-            ZoneTickingUtils.stepTicks(steps);
-            sendMsg("Stepped " + steps + " ticks");
+            ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$setTicksRemaining(steps);
+            sendMsg("Stepping " + steps + " ticks");
         } catch (NumberFormatException e) {
-            sendMsg("The command must be of the form /tick step {number of ticks}");
+            sendMsg("The command must be of the form `/tick step {number of ticks}`");
         }
     }
 
-    public static void delay(IChat chat, String arg1) {
+    public static void rate(IChat chat, String arg1) {
+        if (arg1.toLowerCase().startsWith("reset")) {
+            ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$setTickRate(IMixinTickRunner.DEFAULT_TICK_RATE);
+            sendMsg("Reset tick rate to " + IMixinTickRunner.DEFAULT_TICK_RATE + " ticks per second.");
+            return;
+        }
+
         try {
-            int delay = Integer.parseInt(arg1);
-            if (delay <= 0) {
-                sendMsg("The delay must be a positive non-zero integer!");
+            float rate = Float.parseFloat(arg1);
+            if (rate <= 0) {
+                sendMsg("The tick rate must be a positive non-zero floating-point number!");
                 return;
             }
-            ZoneTickingUtils.setDelay(delay);
-            sendMsg("Set delay to " + delay + " ms");
+            ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$setTickRate(rate);
+            sendMsg("Set tick rate to " + rate + " ticks per second.");
         } catch (NumberFormatException e) {
-            sendMsg("The command must be of the form /tick delay {delay in milliseconds}");
+            sendMsg("The command must be of the form `/tick rate {ticks per second}` or `/tick rate reset`");
         }
     }
 
-    public static void display(IChat chat) {
+    public static void sprint(IChat chat, String arg1) {
+        if (arg1.toLowerCase().startsWith("cancel")) {
+            ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$cancelSprint();
+            sendMsg("Reset tick rate to " + IMixinTickRunner.DEFAULT_TICK_RATE + " ticks per second.");
+            return;
+        }
 
+        try {
+            long ticks = Long.parseLong(arg1);
+            if (ticks <= 0) {
+                sendMsg("The number of ticks to sprint must be a positive, non-zero, whole number!");
+                return;
+            }
+            ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$setSprint(ticks);
+            sendMsg("Sprinting " + ticks + " ticks.");
+        } catch (NumberFormatException e) {
+            sendMsg("The command must be of the form `/tick sprint {ticks per second}` or `/tick sprint cancel`");
+        }
     }
 
     public void run(IChat chat) {
@@ -174,11 +191,19 @@ public class CommandTick extends Command {
                 }
                 break;
             }
-            case "delay": {
+            case "rate": {
                 if (this.hasNextArg()) {
-                    delay(chat, this.getNextArg());
+                    rate(chat, this.getNextArg());
                 } else {
-                    sendMsg("The command must be of the form /tick delay {delay in milliseconds}");
+                    sendMsg("The current tick rate is " + ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$getCustomTickRate() + " ticks per second.");
+                }
+                break;
+            }
+            case "sprint": {
+                if (this.hasNextArg()) {
+                    sprint(chat, this.getNextArg());
+                } else {
+                    sendMsg("The command must be of the form `/tick sprint {ticks per second}` or `/tick sprint cancel`");
                 }
                 break;
             }
@@ -188,15 +213,11 @@ public class CommandTick extends Command {
                 }
 
                 Constants.clientTickGUISpawner.run();
-
-//                Constants.LOGGER.warn(GameSingletons.client());
-//
-//                GameSingletons.client().sendAsClient(new TickGUIPacket());
-
-//                (new TickGUIPacket()).setupAndSend(ServerSingletons.getConnection(this.getCallingPlayer()));
             }
             default: {
-                sendMsg("Unrecognized tick action! Type `/tick help` for a list of valid commands.");
+                sendMsg("""
+                    Unrecognized tick action! Type `/tick help` for a list of valid commands,
+                    or see https://github.com/DarkMattrMaestro/tick-manipulator for more info.""");
                 break;
             }
         }

@@ -12,29 +12,30 @@ Stepping:
 
 ## Command Information
 Help:
-- `/tick help` to get this help command.
+- `/tick help` to get this help information.
 
 Resetting:
-- `/tick reset` to reset all ticking modifiers to the vanilla default (unfrozen, no delay).
+- `/tick reset` to reset all ticking modifiers to the vanilla default.
 
-Freezing:
+Freezing Ticks:
 - `/tick {freeze|unfreeze}` to freeze and unfreeze the game's ticking system.
 
-Stepping:
+Stepping Ticks:
 - `/tick step` to step to the next tick.
 - `/tick step {number of ticks}` to step the given number of ticks. Ticks are evaluated as usual,
   then paused once the given number of ticks are processed. E.g. `/tick step 5` ticks the game
   five times.
 
-Delaying:
-- `/tick delay {delay in milliseconds}` to wait the given number of milliseconds before each tick.
-  E.g. `/tick delay 1000` waits one second before each tick.
+Setting Tick Rate:
+- `/tick rate {ticks per second}` to set the tick rate. The player is not affected by the modified tick rate.
+- `/tick rate reset` to set the tick rate back to the game's default.
 
-> [!NOTE]
-> Stepping and Delaying are mutually exclusive. Stepping can only be used when ticking is frozen,
-  while delaying requires ticking to be unfrozen.
+Sprinting Ticks:
+- `/tick sprint {number of ticks}` to speed through the given number of ticks as quickly as possible.
+  Tick sprinting acts as an expedited version of the tick step command when the ticking system is frozen, which is
+  useful when skipping ahead a few hundred ticks without waiting long.
 
-Repeating:
+Repeating Commands:
 - `/tick repeat add {command}` to add a command to the list of commands run every tick.
   E.g. `/tick repeat add data simple entity velocity` logs the nearest entity's velocity every tick.
 - `/tick repeat clear` to clear the list of commands run every tick.
