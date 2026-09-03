@@ -63,7 +63,7 @@ public class TickRunnerMixin implements IMixinTickRunner {
             sendMsg("Finished sprinting " + this.tickManipulator$sprintTicks + " ticks in " + deltaTimeDays + "d" + deltaTimeHours + "h" + deltaTimeMinutes + "min" + deltaTimeSeconds + "." + deltaTimeMilli + "s");
             this.tickManipulator$setTickRate(IMixinTickRunner.DEFAULT_TICK_RATE);
             this.tickManipulator$sprintStartTime = 0;
-            this.fixedUpdateAccumulator = 0;
+            this.fixedUpdateAccumulator = -1;
         }
     }
 
