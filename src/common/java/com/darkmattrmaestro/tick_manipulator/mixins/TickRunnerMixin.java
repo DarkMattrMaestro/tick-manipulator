@@ -20,32 +20,32 @@ import static com.darkmattrmaestro.tick_manipulator.utils.ChatUtils.sendMsg;
 public class TickRunnerMixin implements IMixinTickRunner {
     @Shadow float fixedUpdateAccumulator;
 
-    @Unique private int ticksRemaining = 0;
-    @Override public int getTicksRemaining() { return this.ticksRemaining; }
-    @Override public void setTicksRemaining(int ticksRemaining) { this.ticksRemaining = ticksRemaining; }
-    @Override public void decrementTicksRemaining() { this.ticksRemaining--; }
+    @Unique private int tickManipulator$ticksRemaining = 0;
+    @Override public int tickManipulator$getTicksRemaining() { return this.tickManipulator$ticksRemaining; }
+    @Override public void tickManipulator$setTicksRemaining(int ticksRemaining) { this.tickManipulator$ticksRemaining = ticksRemaining; }
+    @Override public void tickManipulator$decrementTicksRemaining() { this.tickManipulator$ticksRemaining--; }
 
-    @Unique private boolean frozen = false;
-    @Override public boolean getFrozen() { return this.frozen; }
-    @Override public void setFrozen(boolean frozen) { this.frozen = frozen; }
+    @Unique private boolean tickManipulator$frozen = false;
+    @Override public boolean tickManipulator$getFrozen() { return this.tickManipulator$frozen; }
+    @Override public void tickManipulator$setFrozen(boolean frozen) { this.tickManipulator$frozen = frozen; }
 
-    @Unique private long sprintTicks = 0;
-    @Unique private long sprintStartTime = 0;
-    @Unique private long sprintEndTick = 0;
-    @Override public boolean isSprinting() {
-        return this.sprintEndTick > GameSingletons.world.currentWorldTick && sprintStartTime != 0;
+    @Unique private long tickManipulator$sprintTicks = 0;
+    @Unique private long tickManipulator$sprintStartTime = 0;
+    @Unique private long tickManipulator$sprintEndTick = 0;
+    @Override public boolean tickManipulator$isSprinting() {
+        return this.tickManipulator$sprintEndTick > GameSingletons.world.currentWorldTick && tickManipulator$sprintStartTime != 0;
     }
     @Override
-    public void setSprint(long ticks) {
-        this.sprintEndTick = ticks + GameSingletons.world.currentWorldTick;
-        this.sprintStartTime = System.nanoTime();
-        this.sprintTicks = ticks;
-        this.setTickRate(Float.MAX_VALUE);
+    public void tickManipulator$setSprint(long ticks) {
+        this.tickManipulator$sprintEndTick = ticks + GameSingletons.world.currentWorldTick;
+        this.tickManipulator$sprintStartTime = System.nanoTime();
+        this.tickManipulator$sprintTicks = ticks;
+        this.tickManipulator$setTickRate(Float.MAX_VALUE);
     }
     @Unique
-    public void updateSprinting() {
-        if (this.sprintEndTick < GameSingletons.world.currentWorldTick && sprintStartTime != 0) {
-            long deltaTimeNano = System.nanoTime() - this.sprintStartTime;
+    public void tickManipulator$updateSprinting() {
+        if (this.tickManipulator$sprintEndTick < GameSingletons.world.currentWorldTick && tickManipulator$sprintStartTime != 0) {
+            long deltaTimeNano = System.nanoTime() - this.tickManipulator$sprintStartTime;
             long deltaTimeMilli = deltaTimeNano / 1000000;
 
             long deltaTimeSeconds = deltaTimeMilli / 1000;
@@ -60,37 +60,37 @@ public class TickRunnerMixin implements IMixinTickRunner {
             long deltaTimeDays = deltaTimeHours / 24;
             deltaTimeHours %= 24;
 
-            sendMsg("Finished sprinting " + this.sprintTicks + " ticks in " + deltaTimeDays + "d" + deltaTimeHours + "h" + deltaTimeMinutes + "min" + deltaTimeSeconds + "." + deltaTimeMilli + "s");
-            this.setTickRate(IMixinTickRunner.DEFAULT_TICK_RATE);
-            this.sprintStartTime = 0;
+            sendMsg("Finished sprinting " + this.tickManipulator$sprintTicks + " ticks in " + deltaTimeDays + "d" + deltaTimeHours + "h" + deltaTimeMinutes + "min" + deltaTimeSeconds + "." + deltaTimeMilli + "s");
+            this.tickManipulator$setTickRate(IMixinTickRunner.DEFAULT_TICK_RATE);
+            this.tickManipulator$sprintStartTime = 0;
             this.fixedUpdateAccumulator = 0;
         }
     }
 
-    @Unique private float customTickRate = 20.0F;
-    @Unique private float customUpdateTimestep = 0.05F;
+    @Unique private float tickManipulator$customTickRate = 20.0F;
+    @Unique private float tickManipulator$customUpdateTimestep = 0.05F;
 
     @Override
-    public void setTickRate(float tickRate) {
-        customTickRate = tickRate;
-        customUpdateTimestep = tickRate == Float.MAX_VALUE ? 0 : 1 / tickRate;
+    public void tickManipulator$setTickRate(float tickRate) {
+        tickManipulator$customTickRate = tickRate;
+        tickManipulator$customUpdateTimestep = tickRate == Float.MAX_VALUE ? 0 : 1 / tickRate;
     }
 
-    @Override public float getCustomTickRate() {
-        return customTickRate;
+    @Override public float tickManipulator$getCustomTickRate() {
+        return tickManipulator$customTickRate;
     }
-    @Override public float getCustomUpdateTimestep() {
-        return customUpdateTimestep;
+    @Override public float tickManipulator$getCustomUpdateTimestep() {
+        return tickManipulator$customUpdateTimestep;
     }
 
-    public boolean isTickingStopped() {
-        return this.getFrozen() && this.getTicksRemaining() < 1;
+    public boolean tickManipulator$isTickingStopped() {
+        return this.tickManipulator$getFrozen() && this.tickManipulator$getTicksRemaining() < 1;
     }
 
 
 
     @ModifyConstant(method = "runTicks", constant = @Constant(floatValue = TickRunner.FIXED_UPDATE_TIMESTEP))
-    private float runTicksTimestep(float value) { return this.getCustomUpdateTimestep(); }
+    private float runTicksTimestep(float value) { return this.tickManipulator$getCustomUpdateTimestep(); }
 
     @Redirect(
             method = "runTicks",
@@ -100,15 +100,15 @@ public class TickRunnerMixin implements IMixinTickRunner {
             )
     )
     private <T> void forEachReplacement(Array<T> instance, Consumer<? super T> consumer) {
-        updateSprinting();
-        if (!this.getFrozen() || this.isSprinting()) {
-            this.setTicksRemaining(0);
+        tickManipulator$updateSprinting();
+        if (!this.tickManipulator$getFrozen() || this.tickManipulator$isSprinting()) {
+            this.tickManipulator$setTicksRemaining(0);
         } else {
-            if (this.getTicksRemaining() < 1) {
+            if (this.tickManipulator$getTicksRemaining() < 1) {
                 return;
             }
 
-            decrementTicksRemaining();
+            tickManipulator$decrementTicksRemaining();
         }
 
         instance.forEach((u) -> ((FloatConsumer) u).accept(0.05f)); // Make other consumers think the timestep is normal, mouahahahahaha!
@@ -121,12 +121,12 @@ public class TickRunnerMixin implements IMixinTickRunner {
                     target = "Ljava/lang/Thread;sleep(J)V"
             )
     )
-    private <T> void sleepUpdatePlayer(long millis) throws InterruptedException {
+    private void sleepUpdatePlayer(long millis) throws InterruptedException {
         // No need for delay when sprinting
-        if (this.isSprinting()) { return; }
+        if (this.tickManipulator$isSprinting()) { return; }
 
         // Normal delay
-        if (!this.isTickingStopped()) {
+        if (!this.tickManipulator$isTickingStopped()) {
             Thread.sleep(Math.min(millis, 50));
             millis -= 50;
         }
@@ -137,7 +137,7 @@ public class TickRunnerMixin implements IMixinTickRunner {
             long substepDelay = (millis) / divisions;
             for (int substep = 1; substep <= divisions; substep++) {
                 GameSingletons.world.getZones().forEach((Zone zone) -> {
-                    ((IMixinZone) zone).updatePlayerEntities((float) substepDelay / 1000);
+                    ((IMixinZone) zone).tickManipulator$updatePlayerEntities((float) substepDelay / 1000);
                 });
                 Thread.sleep(substepDelay);
             }

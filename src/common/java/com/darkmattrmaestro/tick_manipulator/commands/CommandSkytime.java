@@ -51,24 +51,24 @@ public class CommandSkytime extends Command {
                     this.commandError("The time must be a valid tick. Can be any number.");
                     return;
                 }
-                ((IMixinZone) zone).setFrozenSkyTime(parsedTick * 0.05F);
+                ((IMixinZone) zone).tickManipulator$setFrozenSkyTime(parsedTick * 0.05F);
                 break;
             }
             case "freeze" -> {
-                if (!((IMixinZone) zone).getIsSkyFrozen()) {
-                    ((IMixinZone) zone).setFrozenSkyTime((float)GameSingletons.world.getCurrentWorldTick() * 0.05F);
+                if (!((IMixinZone) zone).tickManipulator$getIsSkyFrozen()) {
+                    ((IMixinZone) zone).tickManipulator$setFrozenSkyTime((float)GameSingletons.world.getCurrentWorldTick() * 0.05F);
                 }
-                ((IMixinZone) zone).setIsSkyFrozen(true);
+                ((IMixinZone) zone).tickManipulator$setIsSkyFrozen(true);
                 chat.addMessage((Account)null, "[Tick Manipulator] Froze the skytime for zone " + zone.zoneId);
                 break;
             }
             case "unfreeze" -> {
-                ((IMixinZone) zone).setIsSkyFrozen(false);
+                ((IMixinZone) zone).tickManipulator$setIsSkyFrozen(false);
                 chat.addMessage((Account)null, "[Tick Manipulator] Unfroze the skytime for zone " + zone.zoneId);
                 break;
             }
             case "reset" -> {
-                ((IMixinZone) zone).setIsSkyFrozen(false);
+                ((IMixinZone) zone).tickManipulator$setIsSkyFrozen(false);
                 chat.addMessage((Account)null, "[Tick Manipulator] Reset the skytime to the default for zone " + zone.zoneId);
                 break;
             }
@@ -79,8 +79,8 @@ public class CommandSkytime extends Command {
 
         if (GameSingletons.isHost() && ServerSingletons.SERVER != null) {
             SkyPacket skyPacket = new SkyPacket(
-                    ((IMixinZone) zone).getFrozenSkyTime(),
-                    ((IMixinZone) zone).getIsSkyFrozen(),
+                    ((IMixinZone) zone).tickManipulator$getFrozenSkyTime(),
+                    ((IMixinZone) zone).tickManipulator$getIsSkyFrozen(),
                     zone
             );
 

@@ -3,21 +3,14 @@ package com.darkmattrmaestro.tick_manipulator.mixins;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
-import com.darkmattrmaestro.tick_manipulator.Constants;
-import com.darkmattrmaestro.tick_manipulator.PerWorldSingletons;
 import com.darkmattrmaestro.tick_manipulator.interfaces.IMixinZone;
 import com.darkmattrmaestro.tick_manipulator.packets.SkyPacket;
 import finalforeach.cosmicreach.singletons.GameSingletons;
-import finalforeach.cosmicreach.world.RandomTicks;
-import finalforeach.cosmicreach.blocks.blockentities.BlockEntity;
-import finalforeach.cosmicreach.gameevents.blockevents.ScheduledBlockTrigger;
 import finalforeach.cosmicreach.entities.*;
 import finalforeach.cosmicreach.entities.player.Player;
-import finalforeach.cosmicreach.rendering.IRenderable;
 import finalforeach.cosmicreach.settings.DifficultySettings;
 import finalforeach.cosmicreach.util.ArrayUtils;
 import finalforeach.cosmicreach.world.*;
-import finalforeach.cosmicreach.worldgen.ZoneGenerator;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -25,12 +18,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.PriorityQueue;
-import java.util.concurrent.TimeUnit;
-
-import static com.darkmattrmaestro.tick_manipulator.utils.ChatUtils.sendMsg;
-import static java.lang.Integer.max;
 
 @Mixin(Zone.class)
 public class ZoneMixin implements Json.Serializable, Disposable, IMixinZone {
@@ -43,7 +30,7 @@ public class ZoneMixin implements Json.Serializable, Disposable, IMixinZone {
     @Shadow
     public Array<GameEntity> getAllEntities() { return null; }
 
-    @Unique public void updatePlayerEntities(float deltaTime) {
+    @Unique public void tickManipulator$updatePlayerEntities(float deltaTime) {
         ArrayUtils.forEach(this.getAllEntities().toArray(GameEntity.class), (GameEntity e) -> {
             if (!"base:entity_player".equals(e.entityTypeId)) {
                 return;
@@ -58,7 +45,7 @@ public class ZoneMixin implements Json.Serializable, Disposable, IMixinZone {
                 boolean isPeaceful = DifficultySettings.IsPeaceful();
 
                 for (int i = 0; i < this.players.size; ++i) {
-                    Player p = (Player) this.players.get(i);
+                    Player p = this.players.get(i);
                     if (p != null) {
                         Vector3 playerPos = p.getEntity().position;
                         closestDistance = Math.min(closestDistance, e.position.dst(playerPos));
@@ -92,35 +79,35 @@ public class ZoneMixin implements Json.Serializable, Disposable, IMixinZone {
     public void write(Json json) {}
 
     @Shadow
-    public void read(Json json, JsonValue jsonValue) {}
+    public void read(Json json, JsonValue jsonData) {}
 
     @Unique
-    private float savedSkyTimeSeconds;
+    private float tickManipulator$savedSkyTimeSeconds;
     @Unique
-    private boolean isSkyFrozen = false;
+    private boolean tickManipulator$isSkyFrozen = false;
 
     @Unique
-    public void setIsSkyFrozen(boolean isSkyFrozen) {
-        this.isSkyFrozen = isSkyFrozen;
+    public void tickManipulator$setIsSkyFrozen(boolean isSkyFrozen) {
+        this.tickManipulator$isSkyFrozen = isSkyFrozen;
     }
 
     @Unique
-    public boolean getIsSkyFrozen() {
-        return this.isSkyFrozen;
-    }
-
-    @Override
-    public void setFrozenSkyTime(float time) {
-        this.savedSkyTimeSeconds = time;
+    public boolean tickManipulator$getIsSkyFrozen() {
+        return this.tickManipulator$isSkyFrozen;
     }
 
     @Override
-    public float getFrozenSkyTime() {
-        if (!isSkyFrozen) {
-            this.savedSkyTimeSeconds = (float)this.getCurrentWorldTick() * 0.05F;
+    public void tickManipulator$setFrozenSkyTime(float time) {
+        this.tickManipulator$savedSkyTimeSeconds = time;
+    }
+
+    @Override
+    public float tickManipulator$getFrozenSkyTime() {
+        if (!tickManipulator$isSkyFrozen) {
+            this.tickManipulator$savedSkyTimeSeconds = (float)this.getCurrentWorldTick() * 0.05F;
         }
 
-        return this.savedSkyTimeSeconds;
+        return this.tickManipulator$savedSkyTimeSeconds;
     }
 
     @Shadow
@@ -130,11 +117,11 @@ public class ZoneMixin implements Json.Serializable, Disposable, IMixinZone {
 
     @Inject(method = "getCurrentSkyTime", at = @At(value = "HEAD"), cancellable = true)
     public void getCurrentSkyTime(CallbackInfoReturnable<Float> cir) {
-        if (isSkyFrozen) {
-            cir.setReturnValue(this.savedSkyTimeSeconds);
+        if (tickManipulator$isSkyFrozen) {
+            cir.setReturnValue(this.tickManipulator$savedSkyTimeSeconds);
         } else {
-            this.savedSkyTimeSeconds = (float)this.getCurrentWorldTick() * 0.05F;
-            cir.setReturnValue(this.savedSkyTimeSeconds);
+            this.tickManipulator$savedSkyTimeSeconds = (float)this.getCurrentWorldTick() * 0.05F;
+            cir.setReturnValue(this.tickManipulator$savedSkyTimeSeconds);
         }
     }
 

@@ -1,23 +1,23 @@
 package com.darkmattrmaestro.tick_manipulator.interfaces;
 
 public interface IMixinTickRunner {
-    int getTicksRemaining();
-    void setTicksRemaining(int ticksRemaining);
-    void decrementTicksRemaining();
+    int tickManipulator$getTicksRemaining();
+    void tickManipulator$setTicksRemaining(int ticksRemaining);
+    void tickManipulator$decrementTicksRemaining();
 
-    boolean getFrozen();
-    void setFrozen(boolean frozen);
+    boolean tickManipulator$getFrozen();
+    void tickManipulator$setFrozen(boolean frozen);
 
-    boolean isSprinting();
-    void setSprint(long ticks);
+    boolean tickManipulator$isSprinting();
+    void tickManipulator$setSprint(long ticks);
 
-    void setTickRate(float tickRate);
+    void tickManipulator$setTickRate(float tickRate);
 
-    float getCustomTickRate();
+    float tickManipulator$getCustomTickRate();
 
-    float getCustomUpdateTimestep();
+    float tickManipulator$getCustomUpdateTimestep();
 
     float DEFAULT_TICK_RATE = 20.0F;
 
-    boolean isTickingStopped();
+    boolean tickManipulator$isTickingStopped();
 }

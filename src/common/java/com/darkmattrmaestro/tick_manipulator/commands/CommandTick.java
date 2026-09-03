@@ -82,25 +82,25 @@ public class CommandTick extends Command {
     }
 
     public static void reset(IChat chat) {
-        ((IMixinTickRunner) TickRunner.INSTANCE).setTicksRemaining(0);
-        ((IMixinTickRunner) TickRunner.INSTANCE).setFrozen(false);
-        ((IMixinTickRunner) TickRunner.INSTANCE).setTickRate(IMixinTickRunner.DEFAULT_TICK_RATE);
+        ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$setTicksRemaining(0);
+        ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$setFrozen(false);
+        ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$setTickRate(IMixinTickRunner.DEFAULT_TICK_RATE);
         PerWorldSingletons.repeatCalls.clear();
         sendMsg("Ticking reset");
     }
 
     public static void freeze(IChat chat) {
-        ((IMixinTickRunner) TickRunner.INSTANCE).setFrozen(true);
+        ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$setFrozen(true);
         sendMsg("Frozen");
     }
 
     public static void unfreeze(IChat chat) {
-        ((IMixinTickRunner) TickRunner.INSTANCE).setFrozen(false);
+        ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$setFrozen(false);
         sendMsg("Unfrozen");
     }
 
     public static void step(IChat chat) {
-        ((IMixinTickRunner) TickRunner.INSTANCE).setTicksRemaining(1);
+        ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$setTicksRemaining(1);
         sendMsg("Stepped 1 tick");
     }
 
@@ -111,7 +111,7 @@ public class CommandTick extends Command {
                 sendMsg("Steps must be positive (and non-zero)!");
                 return;
             }
-            ((IMixinTickRunner) TickRunner.INSTANCE).setTicksRemaining(steps);
+            ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$setTicksRemaining(steps);
             sendMsg("Stepping " + steps + " ticks");
         } catch (NumberFormatException e) {
             sendMsg("The command must be of the form `/tick step {number of ticks}`");
@@ -120,7 +120,7 @@ public class CommandTick extends Command {
 
     public static void rate(IChat chat, String arg1) {
         if (arg1.toLowerCase().startsWith("reset")) {
-            ((IMixinTickRunner) TickRunner.INSTANCE).setTickRate(IMixinTickRunner.DEFAULT_TICK_RATE);
+            ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$setTickRate(IMixinTickRunner.DEFAULT_TICK_RATE);
             sendMsg("Reset tick rate to " + IMixinTickRunner.DEFAULT_TICK_RATE + " ticks per second.");
             return;
         }
@@ -131,7 +131,7 @@ public class CommandTick extends Command {
                 sendMsg("The tick rate must be a positive non-zero floating-point number!");
                 return;
             }
-            ((IMixinTickRunner) TickRunner.INSTANCE).setTickRate(rate);
+            ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$setTickRate(rate);
             sendMsg("Set tick rate to " + rate + " ticks per second.");
         } catch (NumberFormatException e) {
             sendMsg("The command must be of the form `/tick rate {ticks per second}` or `/tick rate reset`");
@@ -140,7 +140,7 @@ public class CommandTick extends Command {
 
     public static void sprint(IChat chat, String arg1) {
         if (arg1.toLowerCase().startsWith("cancel")) {
-            ((IMixinTickRunner) TickRunner.INSTANCE).setSprint(0);
+            ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$setSprint(0);
             sendMsg("Reset tick rate to " + IMixinTickRunner.DEFAULT_TICK_RATE + " ticks per second.");
             return;
         }
@@ -151,15 +151,11 @@ public class CommandTick extends Command {
                 sendMsg("The number of ticks to sprint must be a positive, non-zero, whole number!");
                 return;
             }
-            ((IMixinTickRunner) TickRunner.INSTANCE).setSprint(ticks);
+            ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$setSprint(ticks);
             sendMsg("Sprinting " + ticks + " ticks.");
         } catch (NumberFormatException e) {
             sendMsg("The command must be of the form `/tick sprint {ticks per second}` or `/tick sprint cancel`");
         }
-    }
-
-    public static void display(IChat chat) {
-
     }
 
     public void run(IChat chat) {
@@ -204,7 +200,7 @@ public class CommandTick extends Command {
                 if (this.hasNextArg()) {
                     rate(chat, this.getNextArg());
                 } else {
-                    sendMsg("The current tick rate is " + ((IMixinTickRunner) TickRunner.INSTANCE).getCustomTickRate() + " ticks per second.");
+                    sendMsg("The current tick rate is " + ((IMixinTickRunner) TickRunner.INSTANCE).tickManipulator$getCustomTickRate() + " ticks per second.");
                 }
                 break;
             }
