@@ -66,6 +66,12 @@ public class CommandTick extends Command {
                 PerWorldSingletons.repeatCalls.add((_) -> {
                     triggerCommand(chat, this.account, subcallArgs);
                 });
+                StringBuilder legibleCommand = new StringBuilder("/");
+                for (String arg: subcallArgs) {
+                    legibleCommand.append(arg);
+                    legibleCommand.append(" ");
+                }
+                sendMsg("Added the following command to repeated command list: " + legibleCommand.toString());
             } else {
                 sendMsg("Unrecognized tick repeat action! Only `clear` and `add` are valid.");
             }

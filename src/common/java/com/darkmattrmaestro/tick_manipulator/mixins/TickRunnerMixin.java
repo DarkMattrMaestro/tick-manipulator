@@ -1,6 +1,7 @@
 package com.darkmattrmaestro.tick_manipulator.mixins;
 
 import com.badlogic.gdx.utils.Array;
+import com.darkmattrmaestro.tick_manipulator.PerWorldSingletons;
 import com.darkmattrmaestro.tick_manipulator.interfaces.IMixinTickRunner;
 import com.darkmattrmaestro.tick_manipulator.interfaces.IMixinZone;
 import finalforeach.cosmicreach.TickRunner;
@@ -11,6 +12,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.function.Consumer;
 
@@ -155,5 +157,10 @@ public class TickRunnerMixin implements IMixinTickRunner {
                 Thread.sleep(substepDelay);
             }
         }
+    }
+
+    @Inject(method = "runTicks", at = @At("TAIL"))
+    private void runRepeatCommands(CallbackInfo ci) {
+        PerWorldSingletons.repeatCalls.forEach((repeatCall) -> repeatCall.accept(null));
     }
 }
